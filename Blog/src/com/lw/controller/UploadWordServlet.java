@@ -15,6 +15,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.dom4j.Document;
 
 import com.lw.utils.ConstFile;
@@ -60,7 +61,7 @@ public class UploadWordServlet extends HttpServlet {
 		upload.setHeaderEncoding("UTF-8");
 		if(!ServletFileUpload.isMultipartContent(request)){
 			return ;
-		}
+		} 
 		try {
 			List<FileItem> list = upload.parseRequest(request);
 			if(list!=null&&list.size()>0){

@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.model.PicturesTable;
@@ -20,22 +19,22 @@ import org.apache.poi.hwpf.usermodel.CharacterRun;
 import org.apache.poi.hwpf.usermodel.Picture;
 import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.BodyElementType;
 import org.apache.poi.xwpf.usermodel.IBodyElement;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFStyles;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyles;
 
 /**
  * 解析word文档的工具类
@@ -43,8 +42,6 @@ import org.dom4j.io.XMLWriter;
  *
  */
 public class WordUtil {
-	
-	private static final String PIC_PATH = "D:\\tmp";//word中图片保存路径
 
 	/**
 	 * 读取word文档，然后将信息保存为定义的xml格式
@@ -85,8 +82,8 @@ public class WordUtil {
 			try {
 				OPCPackage oPCPackage = POIXMLDocument.openPackage(filePath);
 				XWPFDocument xwpf = new XWPFDocument(oPCPackage);
-				POIXMLTextExtractor ex = new XWPFWordExtractor(xwpf);
-
+//				POIXMLTextExtractor ex = new XWPFWordExtractor(xwpf);
+				
 				Iterator<IBodyElement> iter = xwpf.getBodyElementsIterator();
 				int curT = 0;//当前操作表格对象索引
 				int curP = 0;//当前操作文字对象索引
@@ -150,40 +147,26 @@ public class WordUtil {
 									Element pictureE = DocumentHelper.createElement(ConstFile.PICTURE);
 									pictureE.setText(pfName);
 									wordE.add(pictureE);
-									
+								}else if(runXmlText.indexOf("<w:t")!=-1){//文字
+									Element paragraphE = DocumentHelper.createElement(ConstFile.PARAGRAPH);
+									paragraphE.addAttribute("color", OtherUtil.isNotEmpty(run.getColor())? run.getColor():"000000");//格式：0000FF
+									paragraphE.addAttribute("fontSize",String.valueOf(run.getFontSize()));
+									paragraphE.setText(run.toString());
+									wordE.add(paragraphE);
 								}
 							}
-						}
-						String textT = p.getParagraphText();
-						if(!isPic&&null!=textT&&!"".equals(textT.trim())){
-							
-							Element paragraphE = DocumentHelper.createElement(ConstFile.PARAGRAPH);
-							paragraphE.setText(textT);
-							wordE.add(paragraphE);
-							
 						}
 						
 					}
 				}
 				//这里输出只是为了看效果，不是工具类的一部分
-				System.out.println(content.toString());
-				OutputFormat opf = new OutputFormat(" ",true);
-		    	opf.setEncoding("UTF-8");
-		    	XMLWriter xmlW = new XMLWriter(new FileOutputStream("d:\\tmp\\person.xml"),opf);
-		    	xmlW.write(document);
-		    	xmlW.close();
-				/*
-				 * JS动画学习网址：http://www.imooc.com/video/2880Html:[table]Css:[table][picture]经过后面视频发现在css中视频处多加了body{
-					    margin:0;
-					}调试页面发现这个就是8修改成自己的js如下[table]效果图：[picture]Js:透明度动画Html:[table]Css:[table]
-				 */
+//				System.out.println(content.toString());
+//				OutputFormat opf = new OutputFormat(" ",true);
+//		    	opf.setEncoding("UTF-8");
+//		    	XMLWriter xmlW = new XMLWriter(new FileOutputStream("d:\\tmp\\person.xml"),opf);
+//		    	xmlW.write(document);
+//		    	xmlW.close();
 				//对word中读取生成一个xml格式
-				/**
-				 * <xml>
-				 * 	
-				 * </xml>
-				 */
-				
 		    	/*
 				 * 读取图片所在位置，然后保存图片
 				 * 输出格式： rId4
@@ -200,32 +183,6 @@ public class WordUtil {
 			         fos.flush();
 			         fos.close();
 				}
-				//测试，目前已无用的代码=========================start
-				/*
-				 * 获取文字，其中runXmlText是一个xml字符串，这里面有图片所在位置的ID，内容在wordxml.xml中
-				 */
-//				for(XWPFParagraph xp:xwpfList){
-//					List<XWPFRun> runList = xp.getRuns();
-//					if(OtherUtil.isNotEmpty(runList)){
-//						for(XWPFRun run:runList){
-//							String runXmlText = run.getCTR().xmlText();
-//							//图片索引
-//							if(runXmlText.indexOf("<w:drawing")!=-1){
-//								int rIdIndex = runXmlText.indexOf("r:embed=");
-//								int ridEndIndex = runXmlText.indexOf("/>",rIdIndex);
-//								/*
-//								 * rIdText格式：
-//								 *  rId4 
-//									rId5
-//								 */
-//								String rIdText = runXmlText.substring(rIdIndex+"r:embed=".length()+1, ridEndIndex-1);
-//								System.out.println(rIdText);
-//								
-//							}
-//						}
-//					}
-//				}
-				//测试，目前已无用的代码=========================end
 				
 			} catch (Exception e) {
 				e.printStackTrace();

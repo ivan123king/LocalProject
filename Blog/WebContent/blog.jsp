@@ -5,11 +5,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>博客</title>
+<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/base.css"/>
 <%
 	String html = request.getAttribute("html").toString();
 %>
 </head>
 <body>
-	<%=html %>
+	<div contenteditable="true">
+		<%=html %>
+	</div>
 </body>
 </html>

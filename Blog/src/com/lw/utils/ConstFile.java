@@ -12,10 +12,12 @@ public class ConstFile {
 	
 	//html start==========================将word文档中转义的元素变成如下html中可以展示的元素
 	public static String PIC_PATH_H = null;//html展示图片的路径
-	public static final String SPANH = "div"; //paragraph
+	public static final String DIVH = "div"; //paragraph
 	public static final String TABLEH = "table";//table
-	public static final String ROWH = "row";//row
-	public static final String COLH = "col";//col
+	public static final String ROWH = "tr";//row
+	public static final String COLH = "td";//col
+	public static final String PREH = "pre";
 	public static final String IMGH = "img";//picture
+	public static final String SPANH = "span";
 	//html end=============================
 }
