@@ -1,0 +1,19 @@
+
+
+一、读取properties是路径不知道怎么写
+	看OtherUtil类的changeCharacter方法,getResourceAsStream()方法是从classess文件夹下开始算目录的
+	如下代码才能读取出来：
+	public static final String proPath = "/com/lw/utils/character.properties";
+	InputStream is = OtherUtil.class.getResourceAsStream(proPath);
+				pro.load(is);
+				
+	同StringEscapeUtils.escapeXml11 此apache common.lang 包中的转义方法				
+				
+
+二、读取word是无法得知标题
+	在WordUtil类中通过 String style = p.getStyle(); 得到对应数字，仅仅只是表示字体，无法得知是否局中，加粗等
+	6 表示标题，局中
+	2 表示标题一
+	null 正文
+	其他格式正文
+
