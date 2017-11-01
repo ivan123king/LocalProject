@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div>
-	    <form action="<%=request.getContextPath()+"/UploadWordServlet"%>" method="post" enctype="multipart/form-data">
+	    <form action="<%=request.getContextPath()+"/blog/uploadword.action"%>" method="post" enctype="multipart/form-data">
 	        <input id="file_input" type="file" name="file"/>
 	        <input type="submit" name="upload" value="上传"/>
 	    </form>

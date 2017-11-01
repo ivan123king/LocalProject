@@ -1,4 +1,4 @@
-package com.lw.controller;
+package com.lw.controller.blog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,9 +29,11 @@ import com.lw.utils.WordUtil;
  * Servlet implementation class UploadWordServlet
  * 上传word文档的
  */
+@WebServlet("/blog/uploadword.action")
 public class UploadWordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	private static boolean isInitPath = false;
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -49,12 +53,14 @@ public class UploadWordServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		//D:\own_workspace\Blog\WebContent
-		if(ConstFile.PIC_PATH==null)
-			ConstFile.PIC_PATH = request.getSession().getServletContext().getRealPath("")+File.separator+"upload"+File.separator+"images";
-		if(ConstFile.PIC_PATH_H==null)
-			ConstFile.PIC_PATH_H = request.getContextPath()+File.separator+"upload"+File.separator+"images";
-		String uploadPath = request.getSession().getServletContext().getRealPath("")+File.separator+"upload"+File.separator;
+		if(!isInitPath){
+			ConstFile.PIC_PATH = request.getSession().getServletContext().getRealPath("")+ConstFile.PIC_PATH;
+			ConstFile.PIC_PATH_H = request.getContextPath()+ConstFile.PIC_PATH_H;
+		}
+		
+		String uploadPath = request.getSession().getServletContext().getRealPath("")+ConstFile.WORD_PATH+File.separator;
 		String fileP = null;
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload(factory);
@@ -101,7 +107,7 @@ public class UploadWordServlet extends HttpServlet {
 		}
 		
 		request.setAttribute("html", html);
-		request.getRequestDispatcher("/blog.jsp").forward(request, response);
+		request.getRequestDispatcher("/blog/blog.jsp").forward(request, response);
 		
 	}
 
