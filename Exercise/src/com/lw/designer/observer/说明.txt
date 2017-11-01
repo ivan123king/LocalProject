@@ -1,0 +1,17 @@
+观察者模式
+
+Subject是目标对象，也是父类
+    attach 方法是添加观察者
+    detach 方法是删除观察者
+    notifyObserver 方法是目标对象发生改变通知观察者，调用观察者的update方法
+    List<Observer> 是保存注册的观察者集合
+ConcreteSubject是具体目标对象
+
+Observer 是观察者接口
+  update是针对目标对象改变是应对的操作
+ConcreteObserver 是具体的观察者类
+
+
+下面两个类是继承或者实现jdk中已经写好的观察接口和目标类来实现观察者模型
+ConcreteWeatherObserver implements Observer
+ConcreteWeatherSubject extends Observable

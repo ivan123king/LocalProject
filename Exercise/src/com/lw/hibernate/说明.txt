@@ -1,0 +1,4 @@
+学习hibernate的目录
+HibernateTest是一个单元测试类
+最简单的结构：
+News.java  News.hbm.xml hibernate.cfg.xml HibernateTest.java

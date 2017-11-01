@@ -1,0 +1,10 @@
+这个包下面是适配器模式代码
+对象适配器：
+	TwoPlugAdapter
+继承适配器：
+	TwoPlugAdapterExtends
+	
+目标NoteBook 调用change 充电，只支持三项插口
+目前已有条件一个三项插口接口ThreePlug无法充电，一个二项插口GBTwoPlug可以充电
+
+功能：利用二项插口GBTwoPlug可以给NoteBook充电
