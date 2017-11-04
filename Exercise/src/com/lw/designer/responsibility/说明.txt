@@ -1,0 +1,24 @@
+责任链模式
+客户端请求传递过来，然后又handler去处理，如果handler01处理不了就传递给下一层，如果handler02也处理不了就继续往下传递，这就算是责任链模式
+
+PriceHandler类是一个加个折扣的抽象类
+代码是一个购房销售的场景：
+Sales代表底层销售人员，当客户购房需要申请5%以内的折扣时，销售人员自己就可以做主处理
+如果销售做不了主，那么就将这个折扣传递下去给经理Manager,
+Manager是销售经理可以批准在10%以内的折扣，如果超过10%那么就需要传递给CEO，
+CEO是最后的主管，50%以内折扣可以批准，如果超过那么就拒绝不会再传递
+
+PriceHandlerFactory 工厂类，设置层级关系
+这一层层的传递链是通过PriceHandlerFactory中createPriceHandler代码设置好关系：
+PriceHandler sales = new Sales();
+PriceHandler manager = new Manager();
+PriceHandler ceo = new CEO();
+
+sales.setSuccessor(manager);
+manager.setSuccessor(ceo);
+
+return sales;
+
+Customer是一个客户折扣请求
+
+

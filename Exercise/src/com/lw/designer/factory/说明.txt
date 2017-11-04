@@ -1,0 +1,37 @@
+工厂模式：
+有一个工厂生产一组特性相同的产品给客户，另一个工厂生产另一组特性产品给客户
+
+
+发型工厂（简单工厂模式）simple目录下：
+HairInterface是所有发型接口
+LeftHair是左偏分发型
+RightHari是右偏分发型
+HairFactory是发型工厂
+
+抽象工厂模式 abstractf目录下：
+Boy,Girl是一个产品接口
+MCBoy,HNBoy是Boy产品接口的具体实现
+MCGirl,HNGirl是Gril产品接口的具体实现
+PersonFactory是一个抽象工厂
+MCFactory是PersonFactory抽象工厂的具体生产MC系列的工厂
+HNFactory是PersonFactory抽象工厂具体生产HN系列的工厂
+
+抽象工厂模式就是有一些抽象的产品，而会有不同的具体产品，但是这些产品又有在某一方面相似特点，于是就有一个抽象工厂，
+但是对于产品不同的特点需要不同的工厂需生产，这样才能满足客户需求，比如MC系列男女。
+其实就相当于不同的图书分类：工科书，文科书是一类，但有可以分为国内书，国外书，那么就产生工科目录，文科目录，这样才方便这两类人群找书
+而国内目录，国外目录就方便国内人和国外人找他们国家对应的书。
+将产品共性抽象出来，为满足不同的需求而建立不同生产方式建立具体工厂
+
+抽象工厂就是扩展具体产品和具体工厂
+
+
+
+
+PropertiesReader 是一个用来读取properties格式的工具类
+读取不同目录下的properties路径如代码中所示
+使用的是PropertiesReader.class作为路径来获取，所以对于外层的com/lw下的hairtype.properties需要用相对路径
+往上找两个目录
+在和PropertiesReader在同一个编译目录下的就直接可以使用文件名读取，主要是看以什么类目录作为getResourceAsSteam()
+的调用对象
+PropertiesReader.class 的值为  class com.lw.designer.factory.PropertiesReader
+

@@ -1,4 +1,7 @@
 观察者模式
+Observer 观察 Subject是否有改变，如果Subject有改变那么需要调用Notify方法通知观察者，此方法内部会调用Update来让观察者自己执行Subject改变后的动作——观察者模式
+Observer 观察者
+Subject  被观察者，目标对象
 
 Subject是目标对象，也是父类
     attach 方法是添加观察者
