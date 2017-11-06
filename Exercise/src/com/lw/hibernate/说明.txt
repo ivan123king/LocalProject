@@ -1,4 +1,134 @@
 学习hibernate的目录
 HibernateTest是一个单元测试类
 最简单的结构：
-News.java  News.hbm.xml hibernate.cfg.xml HibernateTest.java
+	News.java  News.hbm.xml hibernate.cfg.xml HibernateTest.java
+1. 使用如下方式获取Session
+	Configuration configuration = new Configuration().configure();
+	ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties())
+			.buildServiceRegistry();
+	SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+	Session session = sessionFactory.openSession();
+	Transaction transaction = session.beginTransaction();
+
+2.操作对象
+a)获取对象	News news = (News) session.get(News.class, 1);
+b)保存对象	session.save(news);
+c)根据数据库记录更新session缓存	session.refresh(news);
+d)根据session缓存更新数据库记录	session.flush()
+e)更新对象	session.update(news)
+	此处需要注意如果不是在同一个session中调用update方法，无论对象是否改变都会发送updateSQL给数据库
+	以保证对象更新
+	eg.
+	News news = (News) session.get(News.class, 1);
+	transaction.commit();
+	session.close();
+	session = sessionFactory.openSession();
+	transaction = session.beginTransaction();
+	session.update(news);
+	在News.hbm.xml中class节点设置select-before-update="true"让Hibernate在update时select下确定对象是否改变
+f) session.saveOrUpdate(news);主键ID不为空update,为空save
+g) session.delete(news) 根据OID删除对象
+h) session.evict(news) 从session缓存中将对应的持久化对象移出
+i) session.doWork(new Work() {
+			@Override
+			public void execute(Connection conn) throws SQLException {
+				这里获取原生的JDBC connection操作数据库
+				Hibernate自己没有办法获取到Connection
+			}
+		});
+
+
+
+
+3.提交，关闭session
+	transaction.commit();  ----提交前会先调用 flush方法校验缓存
+	session.close();
+	sessionFactory.close();
+
+session.get()立即加载
+session.load()懒加载，返回代理对象
+
+
+hibernate.cfg.xml相关：
+配置c3p0数据源：
+1.添加jar包：
+	hibernate-release-5.2.12.Final\lib\optional\c3p0   此处是jar包
+		c3p0-0.9.5.2.jar
+		hibernate-c3p0-5.2.12.Final.jar
+		mchange-commons-java-0.2.11.jar
+2. hibernate.cfg.xml中配置如下：
+	hibernate.c3p0.max_size: 数据库连接池的最大连接数
+	hibernate.c3p0.min_size: 数据库连接池的最小连接数
+	hibernate.c3p0.timeout:   数据库连接池中连接对象在多长时间没有使用过后，就应该被销毁  单位：毫秒
+	hibernate.c3p0.max_statements:  缓存 Statement 对象的数量
+	hibernate.c3p0.idle_test_period:  表示连接池检测线程多长时间检测一次池内的所有链接对象是否超时. 
+									连接池本身不会把自己从连接池中移除，而是专门有一个线程按照一定的时间间隔来做这件事，
+									这个线程通过比较连接对象最后一次被使用时间和当前时间的时间差来和 timeout 做对比，
+									进而决定是否销毁这个连接对象。 
+									单位：毫秒
+	hibernate.c3p0.acquire_increment: 当数据库连接池中的连接耗尽时, 同一时刻获取多少个数据库连接
+
+hibernate.jdbc.fetch_size  一次查询多少条数据出来   （分页）
+hibernate.jdbc.batch_size  一次批量保存，更新或者删除多少数据
+PS：上述两项配置对Mysql无效，对oracle有效
+
+更多了解看hibernate自带的手册：hibernate-release-5.2.12.Final\documentation\userguide\html_single
+
+*.hbm.xml文件相关：
+	column节点sql-type可以指定表字段类型
+
+	*.hbm.xml中generator节点如果使用native而不是sequence，
+		对应oracle数据库时需要一个序列hibernate_sequence，
+		这需要自建否则插入oracle数据库中报错
+		
+		native 根据本地策略自动选择生成主键方式
+	
+	看News.hbm.xml中，新增一个desc变量，但是这个desc变量没有对应数据库字段，而是在查询是对应一些特定方式，使用formula
+	<!-- 映射派生属性 -->
+	<property name="desc" type="java.lang.String" formula="(select concat(title,':',author) from News n where n.id=id)"></property>
+	PS: 此处的  n.id = id 一定需要n. 否则如果是id=id 会报错： org.hibernate.exception.DataException: could not extract ResultSet        
+		formula=“(sql)” 的英文括号不能少
+		Sql 表达式中的列名和表名都应该和数据库对应, 而不是和持久化对象的属性对应
+	
+
+时间类型对应：
+	Hibernate		Java				SQL
+	date 			java.sql.Date		DATE
+	time			java.sql.Time		TIME
+	timestamp		java.sql.Timestamp	TIMESTAMP
+	calendar		java.util.Calendar	TIMESTAMP
+	calendar_date	java.util.Calendar	DATE
+	java.util.Date是java.sql.Date,java.sql.Time,java.sql.Timestamp的父类
+	所以java.util.Date可以对应SQL数据库中三种时间。
+	如果对象类型定义为java.util.Date要区别是那种格式时间，在*.hbm.xml配置中property节点的type定义为Hibernate的类型
+		eg.<property name="date" type="date/time/timestamp">    而不是type=java.util.Date
+	            <column name="DATE" />
+	        </property>
+
+
+插播：将图片变为Blob类型
+	Blob blob = new SerialBlob(byte[]);  这样可以将byte变为Blob
+	或者
+	Blob blob = Hibernate.getLobCreator(session).createBlob(is,is.available());
+
+使用Work包含Pay类的方式生成一张表Work，其中有Pay的字段
+	Work.java,Pay.java,Work.hbm.xml
+	Work.hbm.xml加入Pay方式：
+		<!-- 映射组成关系 -->
+		<component name="pay" class="Pay">
+			<!-- 指定组成关系的组件属性 -->
+			<property name="monthlyPay" type="int"></property>
+			<property name="yearPay" type="int"></property>
+		</component>  
+	表结构如下：
+	CREATE TABLE `work` (
+	  `ID` int(11) NOT NULL AUTO_INCREMENT,
+	  `monthlyPay` int(11) DEFAULT NULL,
+	  `yearPay` int(11) DEFAULT NULL,
+	  PRIMARY KEY (`ID`)
+	)	
+		
+
+
+
+

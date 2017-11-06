@@ -7,6 +7,7 @@ public class News {
 	private String title;
 	private String author;
 	private Date date;
+	private String desc;
 	
 	
 	
@@ -45,5 +46,13 @@ public class News {
 	}
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	
+	public String getDesc(){
+		return this.desc;
+	}
+	
+	public void setDesc(String desc){
+		this.desc = desc;
 	}
 }

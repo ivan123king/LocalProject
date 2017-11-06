@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 2017-10-31 14:44:35 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="com.lw.hibernate.News" table="NEWS">
+    <class name="com.lw.hibernate.News" table="NEWS" >
         <id name="id" type="java.lang.Integer">
             <column name="ID" />
             <!-- 指定主键生成方式，native使用数据库本地方式 -->
@@ -18,5 +18,9 @@
         <property name="date" type="java.util.Date">
             <column name="DATE" />
         </property>
+        
+        <!-- 映射派生属性 -->
+        <property name="desc" type="java.lang.String" formula="(select concat(title,':',author) from News n where n.id=id)"></property>
+        
     </class>
 </hibernate-mapping>

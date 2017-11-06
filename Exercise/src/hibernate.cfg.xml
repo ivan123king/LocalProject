@@ -25,7 +25,19 @@
     	<!-- 指定自动生成数据表策略  共有四种 -->
     	<property name="hbm2ddl.auto">update</property>
     	
+    	<!-- 配置c3p0数据连接池 -->
+    	<property name="hibernate.c3p0.max_size">30</property>
+    	<property name="hibernate.c3p0.min_size">2</property>
+    	<property name="hibernate.c3p0.acquire_increment">5</property>
+    	<property name="hibernate.c3p0.timeout">2000</property>
+    	<property name="hibernate.c3p0.idle_test_period">2000</property>
+    	<property name="hibernate.c3p0.max_statements">10</property>
+    	
+    	<!-- <property name="hibernate.jdbc.fetch_size">20</property>
+    	<property name="hibernate.jdbc.batch_size">20</property>
+    	 -->
     	<!-- 指定关联的hbm.xml文件 -->
     	<mapping resource="com/lw/hibernate/News.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/Work.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
