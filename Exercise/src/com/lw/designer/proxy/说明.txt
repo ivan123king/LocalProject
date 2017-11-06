@@ -1,0 +1,44 @@
+代理模式：
+调用此方法其实是调用的类A的方法，在调用类A方法前，我们可以做一些额外处理，这样好处是不改变类A的方法就可以添加逻辑
+
+
+Car是实现Moveable接口的汽车类
+Moveable是一个行驶的接口
+
+Car2是继承代理方式代理Car类的一种实现方式
+Car3是使用聚合方式实现代理Car类的实现方式
+
+dynamic_proxy目录中是使用JDK的动态代理模式
+TimeHandler是时间代理方式
+Test是测试类
+测试TimeHandler代码如下：
+Car car = new Car();
+InvocationHandler h = new TimeHandler(car);//这里才是要真正代理的对象 car
+Class<?> cls = car.getClass();
+/*
+ * 动态创建代理类
+ * loader 类加载器
+ * interfaces 实现接口
+ * h invocationHandler类
+ */
+//这里传的cls就是为了返回一个Moveable的实例化对象，只要能实例化Moveable随便传什么都行			
+Moveable m = (Moveable) Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), h);
+m.move();
+
+
+CarLogProxy,CarTimeProxy是使用聚合方式完成汽车日志和时间代理的类
+LogHandler是为了使用动态代理实现日志记录的代理类
+上述三个类只是为了想如何使用动态方式实现日志记录和时间同时记录
+
+最初想的是使用TimeHandler,LogHandler同时能记录，但发现不行，因为newProxyInstance方法第三参数只能传一个InvocationHandler
+所以使用上述聚合加动态代理方式
+
+
+cglib_proxy是使用cglib.jar来实现的动态代理：
+CGLIB原理
+CGLIB原理：动态生成一个要代理类的子类，子类重写要代理的类的所有不是final的方法。在子类中采用方法拦截的技术拦截所有父类方法的调用，顺势织入横切逻辑。它比使用java反射的JDK动态代理要快。
+CGLIB底层：使用字节码处理框架ASM，来转换字节码并生成新的类。不鼓励直接使用ASM，因为它要求你必须对JVM内部结构包括class文件的格式和指令集都很熟悉。
+CGLIB缺点：对于final方法，无法进行代理。
+
+
+
