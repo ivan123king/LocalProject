@@ -37,7 +37,25 @@
     	<property name="hibernate.jdbc.batch_size">20</property>
     	 -->
     	<!-- 指定关联的hbm.xml文件 -->
-    	<mapping resource="com/lw/hibernate/News.hbm.xml"/>
+    	<!-- <mapping resource="com/lw/hibernate/News.hbm.xml"/>
     	<mapping resource="com/lw/hibernate/Work.hbm.xml"/>
+    	
+    	<mapping resource="com/lw/hibernate/relationship/n21/Customer.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/n21/Order.hbm.xml"/>
+    	
+    	<mapping resource="com/lw/hibernate/relationship/n21_both/Customer.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/n21_both/Order.hbm.xml"/>
+
+    	<mapping resource="com/lw/hibernate/relationship/one2one_foreign/Department.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/one2one_foreign/Manager.hbm.xml"/>
+
+    	<mapping resource="com/lw/hibernate/relationship/one2one_primary/Department.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/one2one_primary/Manager.hbm.xml"/>
+
+    	<mapping resource="com/lw/hibernate/relationship/n2n/Category.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/n2n/Item.hbm.xml"/>
+    	 -->
+    	<mapping resource="com/lw/hibernate/relationship/n2n_both/Category.hbm.xml"/>
+    	<mapping resource="com/lw/hibernate/relationship/n2n_both/Item.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

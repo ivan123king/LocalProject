@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 17:04:14 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.n2n_both" auto-import="false">
+    <class name="Item" table="ITEMS">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" />
+        </property>
+        
+        <!-- 
+        	inverse=true：是因为Category.hbm.xml为false，由categories表维护主键关系
+        	若是这里也维护可能会主键冲突  报错为：ConstraintViolationException
+        	table 此属性需要和Category.hbm.xml一致
+         -->
+        <set name="categories" table="CATEGORIES_ITEMS" inverse="true">
+        	<key>
+        		<!-- 此处的I_ID需要和Category.hbm.xml中设置的many-to-many节点属性column一致 -->
+        		<column name="I_ID"></column>
+        	</key>
+        	<!-- C_ID 需要和Category.hbm.xml中column节点的name属性一致 -->
+        	<many-to-many class="Category" column="C_ID"></many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

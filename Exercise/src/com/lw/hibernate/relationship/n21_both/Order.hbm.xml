@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 13:44:46 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.n21_both" auto-import="false">
+	<!-- 此处表明不是ORDER而是ORDERS，是因为ORDER是SQL的 关键字，在MySql中无法创建此表 -->
+    <class name="Order" table="ORDERS">
+        <id name="orderId" type="java.lang.Integer">
+            <column name="ORDER_ID" />
+            <generator class="native" />
+        </id>
+        <property name="orderName" type="java.lang.String">
+            <column name="ORDER_NAME" />
+        </property>
+        
+        <!-- 
+        	映射多对一的关联关系
+        	Customer表的ID： CUSTOMER_ID 此处是外键
+        	name: 多的一端关联一的一端Order类中的属性名
+        	class:一的一端对应类（com.lw.hibernate.relationship.n21.Customer）
+         -->
+        <many-to-one name="customer" class="Customer" column="CUSTOMER_ID"></many-to-one>
+    </class>
+</hibernate-mapping>

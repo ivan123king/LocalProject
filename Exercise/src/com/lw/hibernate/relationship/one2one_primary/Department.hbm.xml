@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 15:56:05 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.one2one_primary" auto-import="false">
+    <class name="Department" table="DEPARTMENT">
+        <id name="deptId" type="java.lang.Integer">
+            <column name="DEPT_ID" />
+            <!-- 
+            	使用外键的方式生成主键
+             -->
+            <generator class="foreign">
+            	<!-- 指定当前department类的manager属性的主键作为外键 -->
+            	<param name="property">manager</param>
+            </generator>
+        </id>
+        <property name="deptName" type="java.lang.String">
+            <column name="DEPT_NAME" />
+        </property>
+	<!-- 
+		constrained: true 表示在 generator节点表示 class为foreign中添加外键约束
+	 -->
+	<one-to-one name="manager" class="Manager" constrained="true"></one-to-one>
+    </class>
+</hibernate-mapping>

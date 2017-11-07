@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 17:04:14 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.n2n_both">
+    <class name="Category" table="CATEGORIES">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" />
+        </property>
+        <!-- 
+        	CATEGORIES_ITEMS  many-to-many需要生成的中间表
+        	C_ID 这个是此中间表的外键,对应Categories表的ID 
+         -->
+        <set name="items" table="CATEGORIES_ITEMS" inverse="false" lazy="true">
+            <key>
+                <column name="C_ID" />
+            </key>
+            <!-- 此处是Set<Item> items集合对应在中间表的外键名称 -->
+            <many-to-many class="Item" column="I_ID"/>
+        </set>
+    </class>
+</hibernate-mapping>

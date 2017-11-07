@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 15:56:05 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.one2one_foreign" auto-import="false">
+    <class name="Manager" table="MANAGER">
+        <id name="mgrId" type="java.lang.Integer">
+            <column name="MGR_ID" />
+            <generator class="native" />
+        </id>
+        <property name="mgrName" type="java.lang.String">
+            <column name="MGR_NAME" />
+        </property>
+        
+        <!-- 
+        	此处使用one-to-one是因为在Department.hbm.xml中已经有了外键映射关系
+        	
+        	property-ref: manager表中mgr_id使用department类中manager属性对应的数据表列(mgr_id)作为关联条件
+        					否则就关联department表的主键——dept_id
+         -->
+        <one-to-one name="dept" class="Department" property-ref="manager"></one-to-one>
+    </class>
+</hibernate-mapping>

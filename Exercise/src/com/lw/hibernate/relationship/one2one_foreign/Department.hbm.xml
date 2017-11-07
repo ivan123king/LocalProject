@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 15:56:05 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping package="com.lw.hibernate.relationship.one2one_foreign" auto-import="false">
+    <class name="Department" table="DEPARTMENT">
+        <id name="deptId" type="java.lang.Integer">
+            <column name="DEPT_ID" />
+            <generator class="native" />
+        </id>
+        <property name="deptName" type="java.lang.String">
+            <column name="DEPT_NAME" />
+        </property>
+        
+        <!-- 
+        	使用many-to-one映射一对一关系
+        	这里使用多对一映射关系表示一对一关键点在于unique="true" 表示这个外键mgr_id是唯一的 
+        -->
+		<many-to-one name="manager" class="Manager" column="MGR_ID" unique="true"></many-to-one>
+    </class>
+</hibernate-mapping>

@@ -111,6 +111,7 @@ PS：上述两项配置对Mysql无效，对oracle有效
 	或者
 	Blob blob = Hibernate.getLobCreator(session).createBlob(is,is.available());
 
+描述组成关系：Work由Pay和其他变量组成，少了Pay不行
 使用Work包含Pay类的方式生成一张表Work，其中有Pay的字段
 	Work.java,Pay.java,Work.hbm.xml
 	Work.hbm.xml加入Pay方式：
@@ -128,7 +129,139 @@ PS：上述两项配置对Mysql无效，对oracle有效
 	  PRIMARY KEY (`ID`)
 	)	
 		
+单向一对多关系：relationship.n21
+	Customer,Order  一个客户可以拥有多个订单  1对N
+	表现为代码形式就是Customer类中没有Order对象，Order类中有Customer对象
+	
+	Order类中有Customer
+		private Customer customer;   仅仅查询Order此时Customer对象返回代理类，延迟加载Customer
+	Order.hbm.xml中：
+		<!-- 
+        	映射多对一的关联关系
+        	Customer表的ID： CUSTOMER_ID 此处是外键  Customer.hbm.xml -->  <column name="CUSTOMER_ID" />
+        	name: 多的一端关联一的一端Order类中的属性名
+        	class:一的一端对应类（com.lw.hibernate.relationship.n21.Customer）
+         -->
+        <many-to-one name="customer" class="Customer" column="CUSTOMER_ID"></many-to-one>
+   
+	数据库表中表现为有一个customer和orders表，orders表的外键为customer_id
 
+双向一对多关系: relationship.n21_both
+	双向一对多表现为代码形式为： Customer中有Order的集合订单关系，Order类中有Customer对象
+	Customer:
+		/*
+		 * 此处集合初始化为了防止空指针异常
+		 */
+		private Set<Order> orders = new HashSet<Order>();
+	Customer.hbm.xml:
+		<!-- 
+        	映射1对多的集合属性
+        	name: 是Customer类中定义的集合名字 Set<Order> orders
+        	table: Order.hbm.xml中对应表名
+        	key 表示orders表中外键  和 Order.hbm.xml中many-to-one节点填写的column属性一致
+        	one-to-many 表示一对多关系 class是全类名（com.lw.hibernate.relationship.n21_both.Order）
+         
+         	inverse 表示放弃维护关联关系，此时就不会因为Order表更新Customer
+         	
+         	cascade: 设定级联操作
+         				delete 级联删除 
+         				delete-orphan 删除集合orders中元素会同步删除ORDERS表记录
+         				save-update  级联保存更新，保存customer时会同步保存集合中order
+         				all: 所有情况下均进行关联操作，即save-update和delete。
+　　　　　　　　　　			none: 所有情况下均不进行关联操作。这是默认值。 
+			order-by: 查询时排序方式 ，此处是ORDERS表的列名，不是Order类中的名字
+         -->
+        <set name="orders" table="ORDERS" inverse="true" cascade="delete" order-by=" ORDER_NAME desc">
+        	<key column="CUSTOMER_ID"></key>
+        	<one-to-many class="Order"></one-to-many>
+        </set>
+        
+    Order类，和Order.hbm.xml同单向一对多关系
+   	 数据库表表现形式同单向一对多关系    
+	
+外键方式一对一映射关系：one2one_foreign
+	一个部门拥有一个部门经理，一个部门经理管理一个部门   Manager,Department
+	Manager类中包含Department:
+		private Department dept;
+	Manager.hbm.xml：
+		<!-- 
+        	此处使用one-to-one是因为在Department.hbm.xml中已经有了外键映射关系
+        	
+        	property-ref: manager表中mgr_id使用department类中manager属性对应的数据表列(mgr_id)作为关联条件
+        					否则就关联department表的主键——dept_id
+         -->
+        <one-to-one name="dept" class="Department" property-ref="manager"></one-to-one>	
+	Department类中有Manager对象：
+		private Manager manager;
+	Department.hbm.xml:
+		<!-- 使用many-to-one映射一对一关系 -->
+		<many-to-one name="manager" class="Manager" column="MGR_ID" unique="true"></many-to-one>
+	注意： 这里使用many-to-one映射关系如何形成一对一呢？ 关键点在于unique="true" 表示这个外键mgr_id是唯一的	
 
+	数据表表现形式为：一个manager表，一个department表，department表中有一个unique的外键mgr_id
 
+基于主键方式一对一关系：one2one_primary
+	基于主键就是manager表的mgr_id和department表的dept_id相等，dept_id即是department表的主键也是外键，关联manager的mgr_id
 
+	Manager,Department类结构不变
+		Manager.hbm.xml: 不再需要指定property-ref属性
+			<one-to-one name="dept" class="Department"></one-to-one>
+	Department.hbm.xml:
+		<id name="deptId" type="java.lang.Integer">
+            <column name="DEPT_ID" />
+            <!-- 
+            	使用外键的方式生成主键
+             -->
+            <generator class="foreign">
+            	<!-- 指定当前department类的manager属性的主键作为外键 -->
+            	<param name="property">manager</param>   ------->这里就指定dept_id的值使用manager对象的mgr_id的值
+            </generator>
+        </id>
+	
+		<!-- 
+			constrained: true 表示在 generator节点表示 class为foreign中添加外键约束
+		-->
+		<one-to-one name="manager" class="Manager" constrained="true"></one-to-one>
+		注意： 如果没有constrained="true"，那么生成的dept_id就没有foreign_key这个外键约束，虽然依旧会生成manager和department表，运行也正常
+
+单向多对多关系映射：n2n下
+	一个商品目录对应多种商品，一个商品也可能包含在多种商品目录中  Category,Item
+	Category中含有Item:
+		private Set<Item> items = new HashSet<Item>();
+	Category.hbm.xml:
+		<!-- 
+        	CATEGORIES_ITEMS  many-to-many需要生成的中间表
+        	C_ID 这个是此中间表的外键,对应Categories表的ID 
+         -->
+        <set name="items" table="CATEGORIES_ITEMS" inverse="false" lazy="true">
+            <key>
+                <column name="C_ID" />
+            </key>
+            <!-- 此处是Set<Item> items集合对应在中间表的外键名称 -->
+            <many-to-many class="Item" column="I_ID"/>  -------->这里和双向一对多唯一不同之处在于不是one-to-many而是many-to-many
+        </set>	
+
+	Item中不包含Category
+	
+	数据库会生成三个表categrories,items和中间表 categories_items
+
+双向多对多关系映射：n2n_both
+	其他不变唯一不同于单向多对多就是Item包含Category的集合：
+	Item:
+		private Set<Category> categories = new HashSet<Category>();
+	Item.hbm.xml:
+		<!-- 
+        	inverse=true：是因为Category.hbm.xml为false，由categories表维护主键关系
+        	若是这里也维护可能会主键冲突  报错为：ConstraintViolationException
+        	table 此属性需要和Category.hbm.xml一致
+         -->
+        <set name="categories" table="CATEGORIES_ITEMS" inverse="true">
+        	<key>
+        		<!-- 此处的I_ID需要和Category.hbm.xml中设置的many-to-many节点属性column一致 -->
+        		<column name="I_ID"></column>
+        	</key>
+        	<!-- C_ID 需要和Category.hbm.xml中column节点的name属性一致 -->
+        	<many-to-many class="Category" column="C_ID"></many-to-many>
+        </set>
+                      这里要注意Categrory.hbm.xml和Item.hbm.xml只能有一个是inverse=false
+	

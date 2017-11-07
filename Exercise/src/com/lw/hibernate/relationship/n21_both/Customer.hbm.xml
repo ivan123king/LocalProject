@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-11-7 13:44:46 by Hibernate Tools 3.4.0.CR1 -->
+<!-- auto-import="false"如此设置是因为在n21中也有同名的Customer类，冲突
+	让hibernate不自动去搜索类，而是按照给定的package找类
+ -->
+<hibernate-mapping package="com.lw.hibernate.relationship.n21_both" auto-import="false">
+    <class name="Customer" table="CUSTOMER">
+        <id name="customerId" type="java.lang.Integer">
+            <column name="CUSTOMER_ID" />
+            <generator class="native" />
+        </id>
+        <property name="customerName" type="java.lang.String">
+            <column name="CUSTOMER_NAME" />
+        </property>
+        
+        <!-- 
+        	映射1对多的集合属性
+        	name: 是Customer类中定义的集合名字 Set<Order> orders
+        	table: Order.hbm.xml中对应表名
+        	key 表示orders表中外键  和 Order.hbm.xml中many-to-one节点填写的column属性一致
+        	one-to-many 表示一对多关系 class是全类名（com.lw.hibernate.relationship.n21_both.Order）
+         
+         	inverse 表示放弃维护关联关系，此时就不会因为Order表更新Customer
+         	cascade: 设定级联操作
+         				delete 级联删除 
+         				delete-orphan 删除集合orders中元素会同步删除ORDERS表记录
+         				save-update  级联保存更新，保存customer时会同步保存集合中order
+         				all: 所有情况下均进行关联操作，即save-update和delete。
+　　　　　　　　　　			none: 所有情况下均不进行关联操作。这是默认值。 
+         -->
+        <set name="orders" table="ORDERS" inverse="true" cascade="delete" order-by=" ORDER_NAME desc">
+        	<key column="CUSTOMER_ID"></key>
+        	<one-to-many class="Order"></one-to-many>
+        </set>
+        
+    </class>
+</hibernate-mapping>

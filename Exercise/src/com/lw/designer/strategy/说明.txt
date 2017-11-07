@@ -1,0 +1,27 @@
+策略模式：
+	将一组行为抽离出来，使用组合方式来实现此行为的过程
+	
+Duck是所有鸭子的抽象类
+	其中包含 FlyingStrategy 这是飞行行为的接口
+GreenDuck是一个具体的绿头鸭子，继承Duck
+FlyNoWay 和 FlyWithWin 是具体的飞行方式，前者不会飞行，后者用翅膀飞行，实现接口FlyingStrategy
+
+说明：
+在Duck中使用组合方式含有FlyingStrategy使鸭子具有了飞行行为
+同时针对不同的飞行方式实现接口FlyingStrategy可以实现不同的飞行
+GreenDuck只需要设置具体飞行类就能实现特定的飞行
+	public GreenDuck() {
+		super();
+		super.setFlyingStrategy(new FlyWithWin());
+	}
+PS： 在Duck类中组合飞行策略时 private FlyingStrategy flyingStrategy = new FlyNoWay();
+	使用这种声明就实例化的方式可以避免继承子类没有设置飞行方式而调用fly方法导致空指针异常		
+
+比较GreenDuck实现接口FlyingStrategy的方式
+	此时GreenDuck依旧能飞行，但如果下次来一个YellowDuck还是同样飞行方式（飞行A）呢，继续实现FlyingStrategy
+	OK , 1000个具体Duck全部实现了FlyingStrategy后，突然要修改这种飞行A，那么需要修改1000个具体Duck，这会死人的。
+			
+所以策略模式将一组行为抽象出来后  
+	第一： 方便今后修改这一组共性行为
+	第二：方便替换GreenDuck不同的飞行方式，只需要修改super.setFlyingStrategy(new FlyWithWin());
+
