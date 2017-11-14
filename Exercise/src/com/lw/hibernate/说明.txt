@@ -170,8 +170,9 @@ PS：上述两项配置对Mysql无效，对oracle有效
          				all: 所有情况下均进行关联操作，即save-update和delete。
 　　　　　　　　　　			none: 所有情况下均不进行关联操作。这是默认值。 
 			order-by: 查询时排序方式 ，此处是ORDERS表的列名，不是Order类中的名字
+			batch-size： 一次性初始化此集合5条Orders表的记录
          -->
-        <set name="orders" table="ORDERS" inverse="true" cascade="delete" order-by=" ORDER_NAME desc">
+        <set name="orders" table="ORDERS" inverse="true" cascade="delete" order-by=" ORDER_NAME desc" batch-size="5">
         	<key column="CUSTOMER_ID"></key>
         	<one-to-many class="Order"></one-to-many>
         </set>
@@ -194,8 +195,8 @@ PS：上述两项配置对Mysql无效，对oracle有效
 	Department类中有Manager对象：
 		private Manager manager;
 	Department.hbm.xml:
-		<!-- 使用many-to-one映射一对一关系 -->
-		<many-to-one name="manager" class="Manager" column="MGR_ID" unique="true"></many-to-one>
+		<!-- 使用many-to-one映射一对一关系   lazy="proxy"延迟加载-->
+		<many-to-one name="manager" class="Manager" column="MGR_ID" unique="true" lazy="proxy"></many-to-one>
 	注意： 这里使用many-to-one映射关系如何形成一对一呢？ 关键点在于unique="true" 表示这个外键mgr_id是唯一的	
 
 	数据表表现形式为：一个manager表，一个department表，department表中有一个unique的外键mgr_id
@@ -264,4 +265,211 @@ PS：上述两项配置对Mysql无效，对oracle有效
         	<many-to-many class="Category" column="C_ID"></many-to-many>
         </set>
                       这里要注意Categrory.hbm.xml和Item.hbm.xml只能有一个是inverse=false
+
+继承映射关系类型一：subclass
+	使用这种方式需要在父类中添加一个辨别者列，此列是用来区别此数据属于哪个类
+	Person,Student,Person.hbm.xml
+	Student继承Person
+	Person.hbm.xml:
+		1.需要为Person添加discriminator-value辨别字段值
+		<class name="Person" table="PERSONS" discriminator-value="PERSON">
+		2.需要添加一个数据列，告知数据库，此字段不在类内
+		<!-- 配置辨别者列 ：用来区别此条记录是Person的，还是Student的
+        	discriminator-value 用来指定此字段的值是什么Person是PERSON
+        			Student是STUDENT
+        -->
+        <discriminator column="TYPE" type="string"></discriminator>
+        
+        3. 需要为子类做映射关系，同时为子类添加discriminator-value辨别字段值
+        	school字段是Student独有的
+         <!-- 映射子类Student，使用subclass映射
+        	此处是将Student类中独有的school列和Person中列放在一张表中,所以没有为student指定表名
+        	此处的name应该是类名，全名应该包含包名，此处包名放在package属性里，所以省略
+        	此处type的类型使用的是hibernate类型，不是java类型
+         -->
+        <subclass name="Student" discriminator-value="STUDENT">
+        	<property name="school" type="string" column="SCHOOL"></property>
+        </subclass>	
+        
+	     所以上述生成一张persons表，拥有type辨别者列，school列， 当保存记录时type字段根据PERSON还是STUDENT来区别属于哪个类
+	  备注： 查询Person类时会查询出子类的数据
+	  
+继承映射关系类型二：joined_subclass	
+	同样的Student继承Person，Student类没有hbm.xml
+	Person.hbm.xml中只需要添加下述代码：
+		<!-- 此处指定的column即是一个主键也是一个外键，STUDENT_ID是Person表ID的外键 -->
+		<joined-subclass name="Student" table="STUDENTS">
+			<key column="STUDENT_ID"></key>
+			<property name="school" column="school" type="string"></property>
+		</joined-subclass>
+	此时会生成两张表 persons,students表，students表中有student_id,school两列，persons表中有Person类中对应的列
+	查询student需要使用外键student_id连接persons表
 	
+继承映射关系类型三：union_subclass	
+	同样Student继承Person,Student类没有hbm.xml
+	Person.hbm.xml中只需要添加如下代码：
+		<union-subclass name="Student" table="students">
+        	<property name="school" column="SCHOOL" type="string"></property>
+        </union-subclass>
+	备注： Person.hbm.xml中主键生成方式不能是native，我使用hilo方式生成
+	此时会生成两张表persons,students，其中students表也有persons表的列，两个表从数据库看无任何关系
+	查询Person时不仅仅查询persons表，还会左外连接students表数据，同时更新Person类也会更新sutdents表的字段
+	更新Student类只会更新students表。原因：Java的多态
+		此处是Person p = new Person()对象更新，不是Person p = new Student()
+	
+延迟加载对象时调用Hibernate.initialize(对象)来立即加载
+
+HQL检索：面向对象的检索语言   hql包
+	Employee,Department  员工与部门多对一关系
+	查询：使用？做占位符
+		//1.创建Query对象
+		String hql = "from Employee e where e.salary > ? "
+				+ "and e.email like ? "
+				+ "and e.department = ?";
+		Query query = session.createQuery(hql);
+		//2.绑定参数      此处的setEntity需要一个实体参数，new Department对象类型，
+					通过department_id查询，所以只需要这个实体对象有ID就行
+		query.setFloat(0, 600).setString(1,"%18751836672%").setEntity(dept);
+		//3.执行查询
+		List<Employee> emps = query.list();  -----此list方法就是查询
+		System.out.println(emps.size());
+		
+	查询：使用命名方式做占位符
+		String hql = "from Employee e where e.salary > :sal "
+					+ "and e.email like :email";
+		Query query = session.createQuery(hql);
+		//2.绑定参数
+		query.setFloat("sal", 600).setString("email","%18751836672%");
+		
+	查询：也可以直接在HQL语句中塞值，不过容易产生SQL注入
+	
+	查询：分页查询：
+		String hql = "from Employee";
+		Query query = session.createQuery(hql);
+		int pageNo = 3;//第几页
+		int pageSize = 5;//每页多少条
+		List<Employee> emps = query.setFirstResult((pageNo-1)*pageSize)
+			 .setMaxResults(pageSize)
+			 .list();
+		setFirstResult设置第几条记录开始查询，索引从0开始
+		setMaxResults设置每次查询最多多少条记录
+	
+	查询：命名查询：将查询语句通过query节点放在hbm.xml文件中
+		Employee.hbm.xml:
+			<query name="salaryEmps">
+			    <![CDATA[
+			    	from Employee e where e.salary > :minSal and e.salary < :maxSal
+			    ]]>
+		    </query>
+		    <query name="emailQuery">
+			    <![CDATA[
+			    	from Employee e where e.email like :email
+			    ]]>
+		    </query>	
+		
+		通过如下代码获取到此HQL语句：
+			Query query = session.getNamedQuery("salaryEmps");
+			List<Employee> emps = query.setFloat("minSal", 6000)
+									.setFloat("maxSal", 10000)
+									.list();
+		
+			query = session.getNamedQuery("emailQuery");
+			emps = query.setString("email", "%18751836672%").list();
+		此处需要注意like语句， like '%:email%'或者 like %:email%都是错误的，第一种会报java.lang.IllegalArgumentException，第二种是HibernateException
+		
+	查询：投影查询，仅仅查询出其中几列字段
+		1. 简单查询：
+			String hql = "select e.email,e.salary from Employee e where e.department = :dept";
+			Query query = session.createQuery(hql);
+			
+			Department dept = new Department();
+			dept.setId(2);
+			List<Object[]> result = query.setEntity("dept",dept).list();
+		需要用到select字段，返回的是包含email,salary的一个数组，数组放在List中
+		
+		2.将email,salary放在Employee对象中：
+			hql = "select new Employee(e.email,e.salary) from Employee e where e.department = :dept";
+			Employee.java需要增加构造函数：通过反射设值，所以需要一个对应参数的构造函数，
+			无参构造函数为了初始化成功。
+				public Employee(){}
+				public Employee(String email,float salary){
+					super();
+					this.email = email;
+					this.salary = salary;
+				}
+			此时查询返回Employee对象的集合：
+				List<Employee> emps = query.setEntity("dept", dept).list();
+	
+	总结：面向对象SQL语言其实就是根据JAVA中类作为查询对象，使用的字段类型也是类中属性，而不是表字段,其他和SQL一样
+	可以使用count,sum,min,max,order by,group by,having等
+	
+	关联级别：连接表与表查询，注意此处的表是在类内有对应属性的表，比如Department中有Employee的集合，那么Deparment可以连接Employee对应的表查询
+		Employee类中有Department的属性department，那么Employee可以连接Department对应的表查询
+		通过类中属性（emps）来连接employees表，返回Department的集合对象,distinct去除重复的 emps是Department类中的集合属性
+		注意： distinct后面的d字母是Department后面的d,不是随便命名的
+			String hql = "select distinct d from Department d left join fetch d.emps";
+		left join 返回一个数组组成的集合，此数组由Department对象和Employee对象组成一条数据
+			hql = " from Department d left join d.emps";
+		下面这条语句返回Department对象组成的集合
+			hql = " select distinct d from Department d left join d.emps";
+			
+QBC检索：通过hibernate提供的Criteria API来查询
+	//1.创建Criteria 对象
+		Criteria criteria = session.createCriteria(Employee.class);
+		//2. 添加查询条件
+		criteria.add(Restrictions.like("email", "18751836672%"));
+		//3. 执行查询
+//		Employee e = (Employee) criteria.uniqueResult();//得到唯一的数据   上面like如果使用这个会报错：org.hibernate.NonUniqueResultException:
+																						query did not return a unique result
+		List<Employee> emps = criteria.list();
+		
+	and和or查询：
+		//1.and查询  Conjunction本身类似于Criteria对象，其中可以添加Criteria对象
+		Conjunction conjunction = Restrictions.conjunction();
+		conjunction.add(Restrictions.like("name", "%king"));
+		
+		Disjunction disjunction = Restrictions.disjunction();
+		disjunction.add(Restrictions.ge("salary", 1000f));
+		
+		criteria.add(conjunction);
+		criteria.add(disjunction);
+		criteria.list();
+	分页：
+		criteria.setFirstResult((pageNo-1)*pageSize)
+				.setMaxResults(pageSize);
+
+本地SQL检索： 完全的SQL语言搜索，用来完善HQL不支持的查询方式
+	String sql = "";
+	Query query = session.createSQLQuery(sql);
+
+Hibernate缓存：
+	Hibernate有两类级别缓存：第一个是SesionFactory的缓存，是属于进程范围的缓存；
+						第二个是Session的缓存，属于事务范围内的缓存
+	SessionFactory又分为内置缓存和外置缓存，二级缓存配置的就是外置缓存
+			
+添加ehcache缓存：
+	1.添加jar包：hibernate-release-5.2.12.Final\lib\optional\ehcache
+		ehcache-core-2.4.3.jar	
+		hibernate-ehcache-4.2.4.Final.jar
+		slf4j-api-1.6.1.jar				
+	2.添加ehcache对应配置文件：hibernate-release-5.2.12.Final\project\etc
+		ehcache.xml
+	3.在hibernate.cfg.xml中配置启用缓存：
+		<!-- 启用二级缓存 -->
+    	<property name="hibernate.cache.use_second_level_cache">true</property>
+    	<!-- 配置使用的二级缓存的产品 -->
+    	<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+    	此处不是hibernate.properties中提供的类：org.hibernate.cache.internal.EhCacheRegionFactory
+    4. hibernate.cfg.xml配置需要启用二级缓存的类：
+    	<!-- 配置启用二级缓存的类 -->
+    	<class-cache usage="read-only" class="com.lw.hibernate.hql.entities.Employee"/>
+ 
+ 对集合使用缓存：
+ 	<!-- 对集合使用缓存   配置  类名.属性名-->
+    <collection-cache usage="read-only" collection="com.lw.hibernate.hql.entities.Department.emps"/>
+   	 注意：这里对Employee所在的集合emps配置了缓存，如果没有对Employee类配置缓存，此时集合仅仅缓存ID	   	
+    	
+ 
+ 
+ 备注：hibernate.cfg.xml中所有配置都在  hibernate-release-5.2.12.Final\project\etc目录下
+ 	hibernate.properties文件中

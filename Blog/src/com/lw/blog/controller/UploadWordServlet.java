@@ -1,4 +1,4 @@
-package com.lw.controller.blog;
+package com.lw.blog.controller;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,6 +58,7 @@ public class UploadWordServlet extends HttpServlet {
 		if(!isInitPath){
 			ConstFile.PIC_PATH = request.getSession().getServletContext().getRealPath("")+ConstFile.PIC_PATH;
 			ConstFile.PIC_PATH_H = request.getContextPath()+ConstFile.PIC_PATH_H;
+			isInitPath = true;
 		}
 		
 		String uploadPath = request.getSession().getServletContext().getRealPath("")+ConstFile.WORD_PATH+File.separator;
