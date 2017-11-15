@@ -1,0 +1,8 @@
+
+通过数据库逆向工程生成mybatis的Mapper.xml和Mapper.java以及POJO类等
+Create.java是运行的类
+
+generatorConfig.xml是配置文件
+其中配置了生成在哪个目录，生成哪些表
+
+
