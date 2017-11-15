@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace是命名空间，不能重复 -->
+<mapper namespace="com.lw.mapper.CustomerMapper">
+	
+	<!-- 指定表中列值和类中列对应关系 -->
+	<resultMap id="BaseResultMap" type="com.lw.pojo.Customer" >
+	    <id column="CUSTOMER_ID" property="customerId" jdbcType="INTEGER" />
+	    <result column="CUSTOMER_NAME" property="customerName" jdbcType="VARCHAR" />
+  	</resultMap>	
+	
+	<select id="getAllCustomer" resultMap="BaseResultMap">
+		select * from customer
+	</select>
+	<!-- #{}是占位符，里面可以随便写参数名，不仅仅是id也可以是customer_id,customerId等 -->
+	<select id="findByCustomerId" parameterType="int" resultMap="BaseResultMap">
+		select * from customer c where c.customer_id = #{id}
+	</select>
+	<!-- like时只能使用${value} -->
+	<select id="findCustomerWithCondition" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select * from customer c 
+		<!-- 使用where节点会自动去掉SQL中第一个and -->
+		<where>
+			<if test="customerName!=null and customerName!=''">
+				and c.customer_name like '%${value}%'
+			</if>
+		</where>
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,65 @@
+一、简单环境搭建
+1.mybatis的jar包
+2.mybatis的配置文件   mybatis_config.xml随便命名
+	配置数据库：
+		<!-- 数据库配置 -->
+		<environments default="development">
+			<environment id="development">
+				<transactionManager type="JDBC"/>
+				<dataSource type="POOLED">
+					<!-- 此处${}读取的数据库配置是db.properties中的 -->
+					<property name="driver" value="${jdbc.driver}"/>
+					<property name="url" value="${jdbc.url}"></property>
+					<property name="username" value="${jdbc.username}"/>
+					<property name="password" value="${jdbc.password}"/>
+				</dataSource>
+			</environment>
+		</environments>
+	
+3.编写简单POJO测试类 Customer
+4.编写Mapper   CustomerMapper.java,CustomerMapper.xml，命名方式为:POJO名称+Mapper
+5.在mybatis_config.xml中配置此Mapper
+	<!-- 加载映射文件 -->
+	<mappers>
+		<!-- 此处指定加载此包下面的所有Mapper.xml
+			如果只需要加载某个Mapper.xml使用mapper节点的resource=com/lw/mapper/Mapper.xml
+		 -->
+		<package name="com.lw.mapper"/>
+	</mappers>
+
+6.书写CustomerMapper.xml,可以使用select,insert,delete,update
+	<!-- 指定表中列值和类中列对应关系 -->
+	<resultMap id="BaseResultMap" type="com.lw.pojo.Customer" >
+	    <id column="CUSTOMER_ID" property="customerId" jdbcType="INTEGER" />
+	    <result column="CUSTOMER_NAME" property="customerName" jdbcType="VARCHAR" />
+  	</resultMap>
+7.编写CustomerMapper.java接口,其中的方法名是CustomerMapper.xml中的select,insert,delete,update节点
+	的id的名称
+8.编写测试类 SimpleTestCase.java
+	String resource = "mybatis_config.xml";
+	InputStream is = Resources.getResourceAsStream(resource);
+	SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+	SqlSession sqlSession = sqlSessionFactory.openSession();
+	CustomerMapper customerMapper = (CustomerMapper) sqlSession.getMapper(CustomerMapper.class);
+	Customer customer = customerMapper.findByCustomerId(1);
+	System.out.println(customer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
