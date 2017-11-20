@@ -5,13 +5,81 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 <!-- namespace是命名空间，不能重复 -->
 <mapper namespace="com.lw.mapper.CustomerMapper">
-	
+
+	<!-- 配置缓存 -->
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true"
+		 type="com.lw.cache.MyMybatisCache">
+		<!--  此缓存输出文件配置无效，尚不知道怎么使用 -->
+		 <property name="cacheFile" value="d:\tmp\my-custom-cache.tmp"/>
+	</cache>
+
 	<!-- 指定表中列值和类中列对应关系 -->
-	<resultMap id="BaseResultMap" type="com.lw.pojo.Customer" >
-	    <id column="CUSTOMER_ID" property="customerId" jdbcType="INTEGER" />
-	    <result column="CUSTOMER_NAME" property="customerName" jdbcType="VARCHAR" />
-  	</resultMap>	
-	
+	<resultMap id="BaseResultMap" type="com.lw.pojo.Customer">
+		<id column="CUSTOMER_ID" property="customerId" jdbcType="INTEGER" />
+		<result column="CUSTOMER_NAME" property="customerName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="ItemResultMap" type="com.lw.pojo.Item">
+		<id column="id" property="id" jdbcType="INTEGER"></id>
+		<result column="name" property="name" jdbcType="VARCHAR"></result>
+	</resultMap>
+
+	<resultMap type="com.lw.pojo.Customer02" id="Customer02ResultMap">
+		<id column="customer_id" property="CUSTOMER_ID" jdbcType="INTEGER"></id>
+		<result column="customer_name" property="CUSTOMER_NAME"
+			jdbcType="VARCHAR"></result>
+	</resultMap>
+
+	<resultMap id="customerWithItemResultMap" type="com.lw.pojo.Customer02"
+		extends="Customer02ResultMap">
+		<!-- 此处的item是Customer02中的属性值，不是随便写的 -->
+		<association property="item" javaType="com.lw.pojo.Item"
+			resultMap="ItemResultMap" columnPrefix="item_"></association>
+		<!-- 此处的items也是Customer02的集合属性名称，不是随便写的 -->
+		<collection property="items" ofType="com.lw.pojo.Item"
+			columnPrefix="item_">
+			<id column="id" property="id" jdbcType="INTEGER"></id>
+			<result column="name" property="name" jdbcType="VARCHAR"></result>
+		</collection>
+	</resultMap>
+
+	<sql id="item_column">
+		${item}.id as item_id,${item}.name as item_name
+	</sql>
+	<select id="findCustomerWithItem" parameterType="java.lang.Integer"
+		resultMap="customerWithItemResultMap"
+		useCache="true">
+		select
+		<include refid="columns">
+			<property name="co" value="c" />
+			<property name="co1" value="c" />
+		</include>
+		,
+		<include refid="item_column">
+			<property name="item" value="t"></property>
+		</include>
+		from customer c,items t
+		<where>
+			c.customer_id=t.id
+			and c.customer_id=#{id}
+		</where>
+	</select>
+
+
+	<!-- 定义SQL片段 -->
+	<sql id="columns">
+		${co}.CUSTOMER_ID ,${co1}.CUSTOMER_NAME
+	</sql>
+	<select id="findByCustomer02Id" resultType="com.lw.pojo.Customer02">
+		select
+		<include refid="columns">
+			<property name="co" value="c" />
+			<property name="co1" value="c" />
+		</include>
+		from customer c where c.customer_id= #{id}
+	</select>
+
 	<select id="getAllCustomer" resultMap="BaseResultMap">
 		select * from customer
 	</select>
@@ -20,8 +88,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select * from customer c where c.customer_id = #{id}
 	</select>
 	<!-- like时只能使用${value} -->
-	<select id="findCustomerWithCondition" parameterType="java.lang.String" resultMap="BaseResultMap">
-		select * from customer c 
+	<select id="findCustomerWithCondition" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select * from customer c
 		<!-- 使用where节点会自动去掉SQL中第一个and -->
 		<where>
 			<if test="customerName!=null and customerName!=''">
@@ -29,6 +98,64 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			</if>
 		</where>
 	</select>
+
+	<!--
+		useGeneratedKeys="true" 自动生成键值，比如mysql可以自动增长主键值那么可以用
+		 keyProperty="customerId"  这个是将生成的键值反射放入到哪个字段上，customerId是Customer类属性，不是表的列
+		
+		#{customerId},#{customerName}  这里给customer_id和customer_name设值是通过反射获取Customer类
+		里面的customerId和customerName来的，不是随便写的。 
+	  -->
+	<insert id="addNewCustomer"  parameterType="com.lw.pojo.Customer" 
+		useGeneratedKeys="true" keyProperty="customerId">
+		insert into customer(customer_id,customer_name)
+		values(#{customerId},#{customerName})
+	</insert>
+
+	<!-- 
+		#{}是占位符，不容易SQL注入
+		${}是将这个值设置到此SQL中，容易SQL注入  设置varchar值时就要 '${customerName}' 使用''括起来
+	 -->
+	<update id="updateCustomerById" parameterType="com.lw.pojo.Customer" flushCache="false">
+		update customer c 
+		<!-- SET 的配置 如果有多个条件语句会自动去掉最后一个逗号 -->
+		<set>
+			<if test="customerName!=null and customerName!=''">
+				c.customer_name = '${customerName}'
+			</if>
+		</set>
+		<where>
+			c.customer_id = #{customerId}		
+		</where>
+	</update>
 	
-	
+	<delete id="deleteByCustomerId" parameterType="java.util.List">
+		delete from customer where customer_id in 
+		<!-- 循环取出此list中值 -->
+		<foreach collection="list" separator="," item="value" open="(" close=")" index="index">
+			<trim prefix="(" suffix=")" prefixOverrides=",">
+				#{value}+#{index}
+			</trim>
+		</foreach>
+	</delete>
+	<delete id="deleteByCondition" parameterType="java.util.Map">
+		<if test="inMap!=null">
+			delete from customer 
+			<!-- 同下面的where节点等价，prefixOverrides是忽略 or 和 and 符号，否则出现 where and 这种格式
+				注意点： 第二个 and的|符号靠近，同时后面空格，否则不识别,or也需要后面空格
+			 -->
+			<trim prefix="where" prefixOverrides="or |and ">
+				<foreach collection="inMap" item="value" index="key">
+					and ${key} = #{value}
+				</foreach>
+			</trim>
+			
+			<!-- <where>
+				<foreach collection="inMap" item="value" index="key">
+					and ${key} = #{value}
+				</foreach>	
+			</where> -->
+		</if>
+	</delete>
+
 </mapper>

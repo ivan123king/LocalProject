@@ -44,15 +44,169 @@
 	Customer customer = customerMapper.findByCustomerId(1);
 	System.out.println(customer);
 
+扩展：
+学习官网：http://www.mybatis.org/mybatis-3/zh/sqlmap-xml.html
+customer和items建表语句：
+CREATE TABLE `customer` (
+  `CUSTOMER_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `CUSTOMER_NAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`CUSTOMER_ID`)
+)
+CREATE TABLE `items` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+)
+
+mybatis的查询是根据column,property通过反射自动映射到字段上设值，和查询出结果是否唯一没有任何关系
+select c.CUSTOMER_ID ,c.CUSTOMER_NAME , t.id as item_id,t.name as item_name 
+from customer c,items t 
+WHERE c.customer_id=t.id and c.customer_id=? 
+以上查询语句即可以放在Customer02的item中也可以放在items集合中，两者甚至可以同时存在，只要能映射成功就行
+
+使用缓存：
+mybatis的配置文件：mybatis_config.xml:
+	<settings>
+		<setting name="cacheEnabled" value="true"/> ---开启缓存
+	</settings>
+SQL映射文件Mapper.xml:
+	<!-- 配置自定义处理缓存类 -->
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true"
+		 type="com.lw.cache.MyMybatisCache">
+		 <property name="cacheFile" value="d:\\tmp\\my-custom-cache.tmp"/>
+	</cache>
+	MyMybatisCache.java类中实现对应的方法和方法内部返回等：
+		public MyMybatisCache(String id) { -----一定要有这个构造函数，否则报错
+			this.id =id;
+		}
+		另外如果不实现Cache中方法不返回任何东西会报错：
+			Cause: org.apache.ibatis.logging.LogException: Error creating logger for logger null.
+	
+问题记录：自定义缓存后使用update报空指针异常。
+	调试mybatis代码发现会执行到 CachingExecutor.commit此方法，此方法是提交缓存中的数据，然后此方法内部就报错，
+	但获取到的对象都是有的。
+	临时解决方案一：不使用自定义的缓存，即将Mapper.xml中cache节点的type属性去掉
+	临时解决方案二： Mapper.xml中的update节点使用flushCache="false"不刷新缓存,这样依旧能查询出最新数据
+	
+	所以问题还是出在自定义的缓存类有问题
+	
+	初步猜测： update节点会自动调用缓存刷新，SqlSession的commit方法又会调用缓存刷新，会不会冲突
+	明天参考： http://denger.iteye.com/blog/1126423/
+	
+foreach节点传参说明：
+	<foreach collection="inMap" item="value" index="key">
+		and ${key} = #{value} --这里的key和value也是分别对应上面index,item属性值
+	</foreach>
+	此处入参是一个Map类型，通过这里得到key,value,然后进行循环。
+	java代码执行处：
+		如下所示，传入Java代码中的参数是Map的paraMap，其中有一个键为inMap（和collection属性值对应）的Map
+		第二个inMap才是封装参数的地方。
+		Map inMap = new HashMap();
+		inMap.put("customer_name", "king03");
+//		inMap.put("customer_id",13);
+		Map paramMap = new HashMap();
+		paramMap.put("inMap", inMap);
+		customerMapper.deleteByCondition(paramMap);
+		sqlSession.commit();
+	如果要循环List使用下面方式：
+		separator是拼接SQL的连接符，比如 id in (循环)，那么这个循环中就是  id1,id2,如果指定;作为分隔符，
+		那么就是id1;id2;....
+		open,和close属性作为循环前后要添加的符号
+		delete from customer where customer_id in 
+		<foreach collection="list" separator="," item="value" open="(" close=")" 
+			index="index">
+			#{value}+#{index} ----index是0,1,2,3的下标，不同于Map的key
+		</foreach>
+		备注：此处的collection属性值是固定的。
+			如果传入的是单参数且参数类型是一个List的时候，collection属性值为list
+	    	 如果传入的是单参数且参数类型是一个array数组的时候，collection的属性值为array
+	    	 
+	   java代码入参如下：
+		   	List list = new ArrayList();
+			list.add(4);
+			list.add(2);
+			list.add(9);
+			customerMapper.deleteByCustomerId(list);
+	
+另外还需要注意一点就是Mysql在使用delete语句时不能使用delete tablename c where c.XXX 这种为表名指定别名的事情
 
 
+关于set节点：set 元素会动态前置 SET 关键字，同时也会消除无关的逗号
+	<update id="updateAuthorIfNecessary">
+	  update Author
+	    <set>
+	      <if test="username != null">username=#{username},</if>
+	      <if test="password != null">password=#{password},</if>
+	      <if test="email != null">email=#{email},</if>
+	      <if test="bio != null">bio=#{bio}</if>
+	    </set>
+	  where id=#{id}
+	</update>
+
+mybatis提供了SQL类用来构建Sql语句：这样就可以很清晰的看到语句执行方式，而不用自己写一堆String拼接
+	SQL sql = new SQL();
+	sql.SELECT("c.customer_id,c.customer_id");
+	sql.SELECT("t.id as item_id,t.name as item_name");
+	sql.FROM("customer c","items t");
+	sql.WHERE("c.customer_id = t.id");
+	sql.AND();
+	sql.WHERE("c.customer_name = 'king'");
+	输出：
+	SELECT c.customer_id,c.customer_id, t.id as item_id,t.name as item_name
+	FROM customer c, items t
+	WHERE (c.customer_id = t.id) 
+	AND (c.customer_name = 'king')
+
+Mybatis日志注意点：
+	SLF4J
+	Apache Commons Logging
+	Log4j 2
+	Log4j
+	JDK logging
+	具体选择哪个日志实现工具由MyBatis的内置日志工厂确定。它会使用最先找到的（按上文列举的顺序查找）。
+	 如果一个都未找到，日志功能就会被禁用。
+	
+	所以如果想直接使用log4j作为日志输出可以使用如下配置：
+		<configuration>
+		  <settings>
+		    ...
+		    <setting name="logImpl" value="LOG4J"/>
+		    ...
+		  </settings>
+		</configuration>
+		SLF4J、LOG4J、LOG4J2、JDK_LOGGING、COMMONS_LOGGING、STDOUT_LOGGING、NO_LOGGING 
+		或者是实现了接口org.apache.ibatis.logging.Log的类的完全限定类名，
+		 并且这个类的构造函数需要是以一个字符串（String类型）为参数的。 
+		（可以参考org.apache.ibatis.logging.slf4j.Slf4jImpl.java的实现）
 
 
-
-
-
-
-
+疑点：
+	如何获取Connection
+		Connection conn = sqlSession.getConfiguration().getEnvironment()
+							.getDataSource().getConnection();
+		
+事后补充说明：
+	Class Customer:
+		Item item
+		List<Item> items
+	对于item的获取可在CustomerMapper.xml中使用association节点
+	对于items获取可在CustomerMapper.xml中使用collection节点
+	例如： CustomerMapper.xml中的findCustomerWithItem方法，使用的resultMap中配置：
+		<resultMap id="customerWithItemResultMap" type="com.lw.pojo.Customer02"
+			extends="Customer02ResultMap">
+			<!-- 此处的item是Customer02中的属性值，不是随便写的 -->
+			<association property="item" javaType="com.lw.pojo.Item"
+				resultMap="ItemResultMap" columnPrefix="item_"></association>
+			<!-- 此处的items也是Customer02的集合属性名称，不是随便写的 -->
+			<collection property="items" ofType="com.lw.pojo.Item"
+				columnPrefix="item_">
+				<id column="id" property="id" jdbcType="INTEGER"></id>
+				<result column="name" property="name" jdbcType="VARCHAR"></result>
+			</collection>
+		</resultMap>
+		
+	
+	
 
 
 

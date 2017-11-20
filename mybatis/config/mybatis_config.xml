@@ -4,9 +4,18 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+
 	<!-- 加载数据库配置属性文件 -->
 	<properties resource="db.properties">
 	</properties>
+	
+	<settings>
+		<!-- 开启驼峰映射方式 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="cacheEnabled" value="true"/>
+		<!-- 选择日志输出方式，此处使用log4j的jar包输出日志 -->
+		<setting name="logImpl" value="LOG4J"/> 
+	</settings>
 	
 	<!-- 数据库配置 -->
 	<environments default="development">
@@ -21,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			</dataSource>
 		</environment>
 	</environments>
-
+	
 	<!-- 加载映射文件 -->
 	<mappers>
 		<!-- 此处指定加载此包下面的所有Mapper.xml
