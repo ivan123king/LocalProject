@@ -1,0 +1,412 @@
+构建简单spring案列的目录
+Application.java,MessagePrinter.java,MessageService.java是官网的案例
+
+一、简单案例（IOC--控制反转）
+UserDao.java,UserDaoImpl.java,applicationContext.xml
+构成一个简单spring容器初始化对象例子
+TestIoc.java是测试类
+	//初始化spring容器，加载配置文件
+	ApplicationContext context = new ClassPathXmlApplicationContext(
+			"applicationContext.xml");
+	//通过容器获取userDao实例
+	UserDao userDao = (UserDao) context.getBean("userDao");
+	//调用实例中方法测试是否正常初始化
+	userDao.say();
+UserDao是接口，UserDaoImpl是此接口的实现类
+applicationContext.xml是spring配置文件
+	<!-- 在容器中注册对象    注意class属性是配置的实现类，不是接口类-->	
+	<bean id="userDao" class="com.lw.spring.springframework.UserDaoImpl"/>
+
+二、依赖注入：(DI)
+	新增UserService.java,UserServiceImpl.java
+	UserServiceImpl.java中需要UserDao对象，而初始化userDao对象依赖Spring容器注入
+		//由spring容器反射实例化userDao对象
+		private UserDao userDao = null;
+		public void setUserDao(UserDao userDao) {
+			this.userDao = userDao;
+		}
+	applicationContext.xml中新增：
+		<bean id="userService" class="com.lw.spring.springframework.UserServiceImpl">
+			<!-- 此处的name值是对应UserServiceImpl中对应的属性名称，不是随便起的 -->
+			<property name="userDao" ref="userDao"></property>	
+		</bean>
+	测试同IOC，获取Service的对象调用即可
+
+三、工厂创建对象  factory-method属性使用
+	BeanFactory.java是用来实例化Bean对象的工厂类
+		public static Object createBean(){
+			return new UserServiceImpl();
+		}
+	在applicationContext.xml配置文件中配置bean对象
+		<!-- 工厂方法构造对象  factory-method指定工厂方法,此方法必须是静态的-->
+		<bean id="userService02" class="com.lw.spring.springframework.BeansFactory"
+			factory-method="createBean">
+		</bean>
+	测试：
+		ApplicationContext context = new ClassPathXmlApplicationContext(xml);
+		UserService userService = (UserService)context.getBean("userService02");
+		System.out.println(userService);
+		userService.say();
+		1. 使用beanFactory得到的不是BeansFactory对象，而是createBean返回的UserServiceImpl对象
+		2. userService对象中的UserDao属性没有被初始化，使用工厂创建对象就无法使用Spring容器依赖注入UserDao
+factory-bean属性使用：此属性指定对应的工厂类
+	applicationContext.xml中配置：
+		<bean id="beanFactory" class="com.lw.spring.springframework.BeansFactory"/>
+		<bean id="userService03" factory-bean="beanFactory" factory-method="createService">
+		</bean>
+	1.不同于上面仅仅使用factory-method属性，此处配置了BeanFactory的bean，会初始化此工厂类
+	2.其他同上，能返回UserServiceImpl，但是不会注入UserDao
+
+bean的scope作用域属性值：
+	singleton： 单例，一个容器创建一个对象，共享
+	prototype： Spring容器会为每个对该Bean的请求都创建一个新实例
+	request:对不同http请求会产生新的Bean
+	session:对不同http请求会产生新的Bean,而且此Bean仅仅在当前Http Session内有效
+	......
+
+Spring三种装配Bean的方式： assemblage包下
+一、通过XML装配：
+	applicationContext.xml中如下配置：这两种方法的配置会调用User类中有参构造函数
+		<!-- 通过XML方式装配User实例 -->
+		<!-- 方法一：通过索引注入构造函数的值 -->
+		<bean id="user1" class="com.lw.spring.springframework.assemblage.User">
+			<constructor-arg index="0" value="tom"/>
+			<constructor-arg index="1" value="123455"/>
+			<constructor-arg index="2">
+				<list>
+					<value>"constructorValue01"</value>
+					<value>"constructorValue02"</value>
+				</list>
+			</constructor-arg>
+		</bean>
+		<!-- 方法二： 通过属性名注入构造函数的值  -->
+		<bean id="user2" class="com.lw.spring.springframework.assemblage.User">
+			<constructor-arg name="userName" value="幻影骑士"/>
+			<constructor-arg name="password" value="123456"/>
+			<constructor-arg name="list">
+				<list>
+					<value>"constructorValue11"</value>
+					<value>"constructorValue12"</value>
+				</list>
+			</constructor-arg>
+		</bean>	
+		
+	constructor-arg节点是为了装配到User类中有参构造函数值：
+		public User(String userName, Integer password, List<String> list) {
+			super();
+			this.userName = userName;
+			this.password = password;
+			this.list = list;
+		}
+二、基于注解方式装配：
+	@Component：注解描述Bean,仅仅表示一个组件
+	@Repository: 用于将Dao层的类标识为Spring中Bean，与@Component作用相同
+	@Service: 用于将Service层的类标识为Spring中的Bean，与@Component作用相同
+	@Controller:用于将控制层的的类标识为Spring中的Bean，与@Component作用相同
+	@Autowired: 用于对Bean的属性，属性的setter方法以及构造方法进行标注，完成Bean的自动配置工作。
+		默认按照Bean类型装配
+	@Resource：与@Autowired作用一样，区别在于此默认按照Bean的实例进行装配。
+		Resource有两个重要属性：name,type
+			Spring将name属性解析为Bean的实例名称，type解析为Bean的实例类型
+			装配顺序： name--->type--->(name或者type都无法完成装配报错：NoSuchBeanDefinitionException)
+		PS:@Resource(type=UserDaoImpl.class)  type装配
+		   @Resource(name="userDao")  name装配
+	@Qualifier: 与@Autowired配合使用，将默认按照Bean类型装配改成按照Bean实例装配
+列子为： UserDaoImpl.java,UserServiceImpl.java,UserController.java
+	applicationContext.xml中配置：
+		1.在beans节点增加 xmlns:context="http://www.springframework.org/schema/context"
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+	PS:spring-framework-5.0.2.RELEASE-dist\spring-framework-5.0.2.RELEASE\schema\context\spring-context.xsd
+		2.  <!-- 1. 开启注解处理器 -->
+			<context:annotation-config/>
+			<!-- 2.扫描指定包下面所有类使用注解
+				如果需要指定某个类使用<bean id="" class=""/>配置
+			 -->
+			<context:component-scan base-package="com.lw.spring.springframework.assemblage"/>		
+	
+三、自动装配
+	applicationContext.xml中
+		<bean id="" class="" autowire="byName"/>
+	此时就会开始按照类中属性名称使用setter方法找容器中对应id和属性名称一样的装配
+	default-autowire="" 设置默认装配方式
+	byType是按照类型装配
+	no  不使用自动装配
+	constructor 根据构造函数的参数数据类型使用byType模式自动装配
+		public UserService(User user) 此时使用constructor就会按照User的class来找，装配	
+
+代理介绍：
+	代理一： JDK Proxy 方法代理：JdkProxy.java
+		JdkProxy是生成代理对象，此中可以对目标对象的方法前后做特殊处理
+		UserDaoImpl是实现接口UserDao的目标对象，
+		MyAspect是切面对象，在其中可以增加统一的额外处理
+		
+		1.生成代理对象：
+			this.userDao = userDao;
+			//1.类加载器
+			ClassLoader classLoader = JdkProxy.class.getClassLoader();
+			//2. 被代理对象实现所有接口
+			Class[] clazz = userDao.getClass().getInterfaces();
+			//3. 使用代理类进行增加，返回被代理后的对象
+			return Proxy.newProxyInstance(classLoader,clazz,this);
+		2.对目标对象做处理：
+			//声明切面
+			MyAspect myAspect = new MyAspect();
+			myAspect.check_Permissions();
+			Object obj = method.invoke(userDao,args);
+			myAspect.log();
+			return obj;
+		 此处代码在调用目标对象方法前增加了权限检查，在调用目标对象方法后增加了日志记录，并没有改变目标对象代码，
+	    同时权限以及日志记录都由统一的代码管理控制。
+	    3.测试方法：
+	    	//创建代理对象
+			JdkProxy jdkProxy = new JdkProxy();
+			//创建目标对象
+			com.lw.spring.springframework.aspect.UserDao userDao = new UserDaoImpl();
+			//获取代理对象
+			com.lw.spring.springframework.aspect.UserDao userDao02 = (com.lw.spring.springframework.aspect.UserDao) jdkProxy.createProxy(userDao);
+			//執行方法
+			userDao02.addUser();
+			userDao02.deleteUser();
+		这也是为什么无论是Hibernate还是Spring等框架管理的对象喜欢返回代理对象原因。
+	 代理对象并不是原生的对象，在应用代理对象时无法知道此代理前后的动作，此时就可以对目标对象的方法做额外处理。
+	
+	代理二： CGLIB代理 CglibProxy.java
+		具体原理见 designer包下面的说明.txt
+Spring AOP :在 aspect包下面
+	切面原理：使用代理将目标类在调用方法前后做处理后，返回目标对象，
+		此时目标对象调用内部方法时前后就做了特殊处理，而不改动目标对象代码。
+  一、基于代理的AOP实现
+	类：proxy包下UserDao,UserDaoImpl,
+	  aspect包下MyAspect
+  1.MyAspect切面类实现代理接口 MethodInterceptor,并重写invoke方法；
+  		invoke方法实现如下：在执行proceed方法前后执行了自己的方法
+  			check_Permissions();
+			//执行目标方法
+			Object obj = invocation.proceed();
+			log();
+  2. applicationContext.xml中配置如下：
+  	<!-- 1.目标类 -->
+	<bean id="userDao" class="com.lw.spring.springframework.aspect.proxy.UserDaoImpl"/>
+	<!-- 2.切面类 -->	
+	<bean id="myAspect" class="com.lw.spring.springframework.aspect.MyAspect"/>
+	<!-- 3.使用Spring的代理工厂定义一个userDaoProxy代理对象 -->
+	<bean id="userDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<!-- 指定代理实现的接口 -->
+		<property name="proxyInterfaces" value="com.lw.spring.springframework.aspect.proxy.UserDao"/>
+		<!-- 指定目标对象 -->
+		<property name="target" ref="userDao"/>
+		<!-- 指定切面，植入环绕通知 -->
+		<property name="interceptorNames" value="myAspect"/>
+		<!-- 指定代理方式，true：使用cglib,false(默认)：使用jdk动态代理 -->
+		<property name="proxyTargetClass" value="true"/>
+	</bean>
+备注一：为什么此处切面是环绕通知
+	此处是环绕同时是因为MyAspect实现了MethodInterceptor，这是环绕通知接口
+	org.springframework.aop.MethodBeforeAdvice  前置通知
+	org.springframework.aop.AfterReturningAdvice 后置通知
+	org.springframework.aop.ThrowsAdvice	异常通知
+	org.springframework.aop.IntroductionInterceptor  引介通知
+备注二： 读取ProxyFactoryBean源码后发现并没有target类，那么property节点设置的target属性对象是给谁赋值？
+	org.springframework.aop.framework.AdvisedSupport 中有一个setTarget，
+	ProxyFactoryBean的继承对象的继承对象就是AdvisedSupport
+	
+	测试方法：
+		ApplicationContext context = new ClassPathXmlApplicationContext(xml);
+		//注意此处使用的是由ProxyFactoryBean产生的代理对象
+		UserDao userDao = (UserDao)context.getBean("userDaoProxy");
+		//使用的代理对象，所以在调用addUser,deleteUser前后才能先执行权限校验，然后记录日志。
+		userDao.addUser();
+		userDao.deleteUser();	
+
+二、AspectJ方法实现AOP：推荐使用
+	一、 使用XML方式
+	MyAspectJ.java  proxy中UserDao,UserDaoImpl
+	
+	applicationContext.xml中配置如下：
+	1.添加新aop的xml作用域
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd	
+	2.切面的xml配置：
+		<!-- 定义切面Bean -->
+		<bean id="myAspect" class="com.lw.spring.springframework.aspect.MyAspectJ"/>
+		<aop:config>
+			<!-- 1.配置切面 -->
+			<aop:aspect id="aspect" ref="myAspect">
+				<!--2.配置切入点
+					第一个* 表示返回类型，此处配置所有返回类型
+					第二个* 表示类名，此处代表此aspect包下所有类，
+					第三个* 表示方法，此处表示类中所有方法
+					(..) 表示方法中参数
+				 -->
+				<aop:pointcut expression="execution(* com.lw.spring.springframework.aspect.proxy.*.*(..))" 
+					id="myPointCut"/>
+				<!-- 3.配置前置通知 -->
+				<!-- 前置通知 -->
+				<aop:before method="myBefore" pointcut-ref="myPointCut"/>
+				<!-- 后置通知 -->
+				<aop:after-returning method="myAfterReturning" pointcut-ref="myPointCut" returning="returnVal" />
+				<!-- 环绕通知 -->
+				<aop:around method="myAround" pointcut-ref="myPointCut"/>
+				<!-- 异常通知 -->
+				<aop:after-throwing method="myAfterThrowing" pointcut-ref="myPointCut" throwing="e"/>
+				<!-- 最终通知 -->
+				<aop:after method="myAfter" pointcut-ref="myPointCut"/>
+			</aop:aspect>
+		</aop:config>
+	aop:aspect会自动将myAspect类转换为切面类。
+	这些method都是要在类MyAspectJ中实现的。
+	备注： execution(* com.lw.spring.springframework.aspect.*.*.*(..))
+		execution(* com.lw.spring.springframework.aspect.*.*(..))
+		注意表达式一，和表达式二的区别，表达式一aspect包后面跟了三个*，第一个*匹配aspect包下面所有包，
+	所以aspect包下面的所有类都会应用此切面；
+		表达式二aspect包后面只有两个*，第一个表示匹配所有类，第二个表示类中所有方法
+	
+	测试：
+		ApplicationContext context = new ClassPathXmlApplicationContext(xml);
+		UserDao userDao = (UserDao) context.getBean("userDao");
+		userDao.addUser();
+	
+	测试正常输出：
+		前置通知：模拟权限检查.目标类是：com.lw.spring.springframework.aspect.proxy.UserDaoImpl@6aba2b86, 被植入增强处理的目标方法为:addUser
+		环绕开始，执行目标方法前，模拟开启事务。
+		Dao添加用户
+		最终通知：模拟方法结束后释放资源.
+		环绕结束，执行目标方法之后，模拟关闭事务。
+		后置通知：模拟日志记录. 被植入增强处理的目标方法为:addUser
+	测试异常输出：
+		前置通知：模拟权限检查.目标类是：com.lw.spring.springframework.aspect.proxy.UserDaoImpl@158da8e, 被植入增强处理的目标方法为:addUser
+		环绕开始，执行目标方法前，模拟开启事务。
+		Dao添加用户
+		最终通知：模拟方法结束后释放资源.
+		异常通知:com.lw.spring.springframework.aspect.proxy.UserDaoImpl@158da8e 出错了 自定义异常。
+	异常输出，没有环绕结束的执行，也没有后置通知执行，有异常通知执行。	
+		
+	备注： 后置通知和最终通知不同之处在于，如果目标对象方法执行出错就不会执行到后置通知，而是转为执行异常通知，但是最终通知依旧会执行。
+	
+	二、使用注解
+		@Aspect 定义一个切面
+		@Pointcut 定义切入点表达式
+		@Before 定义前置通知，相当于aop:before节点和MethodBefore接口
+		@AfterReturning 用于定义后置通知， 相当于aop:after-returning 节点和AfterReturningAdvice接口
+		@Around 用于定义环绕通知，相当于 around或者 MethodInterceptor接口
+		@AfterThrowing 用于定义异常通知，相当于  aop:after-throwing节点和ThrowingAdvice接口
+		@After 定义最终通知，相当于aop:after
+		@DeclareParents  定义引介通知，相当于IntroductionInterceptor  不常用
+	
+	步骤一：编写切面类： MyAspectJByAnnotation.java
+	步骤二：编写UserDaoImpl.java目标对象的注解 @Repository("userDao")
+	步骤三：在Spring配置文件applicationContext.xml中开启注解 
+		<context:component-scan base-package="com.lw.spring.springframework.aspect"/>
+		<!-- 启动基于注解的声明式AspectJ支持 -->
+		<aop:aspectj-autoproxy/>
+
+Spring JDBC: jdbc包下
+	JdbcTemplate类简单案例：
+		applicationContext.xml中配置：
+			<!--1. 配置数据源 -->
+			<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+				<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+				<property name="url" value="jdbc:mysql://localhost:3306/test"/>
+				<property name="username" value="root"/>
+				<property name="password" value="root"/>
+			</bean>
+			<!--2. 配置JDBC模板 -->
+			<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+				<!-- 默认必须使用数据源， ref的值参考上面的bean id属性 -->
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+		
+		测试： 
+			ApplicationContext context = new ClassPathXmlApplicationContext(xml);
+			JdbcTemplate jdbcTemplate = (JdbcTemplate)context.getBean("jdbcTemplate");
+			String sql = " insert into customer(customer_name) values(?) ";
+			Object[] obj = new Object[]{"tacimei"};
+			//返回受影响行数
+			int num = jdbcTemplate.update(sql,obj); ----插入
+			
+			sql = "update customer c set c.customer_name = ? where c.id = ?";
+			obj = new Object[]{"liuwei",7};
+			//返回受影响行数
+			num = jdbcTemplate.update(sql,obj);  -----更新
+			
+			sql = "delete from customer where id=?";
+			//返回受影响行数
+			num = jdbcTemplate.update(sql,9);  -----删除
+	
+	查询一：
+		String sql = "select * from customer where id=?";
+		RowMapper<Customer> rowMapper = new BeanPropertyRowMapper<Customer>(Customer.class);
+		jdbcTemplate.query(sql,rowMapper,id);
+		
+		Customer类中字段必须和customer中字段名称一致
+		customer表   
+			CREATE TABLE `customer` (
+			  `CUSTOMER_ID` int(11) NOT NULL AUTO_INCREMENT,
+			  `CUSTOMER_NAME` varchar(255) DEFAULT NULL,
+			  PRIMARY KEY (`CUSTOMER_ID`)
+			) 
+		Customer类： Integer CUSTOMER_ID
+				   String CUSTOMER_NAME
+		如果使用  select customer_name as customerName 这种Customer类必须要是customerName
+		
+Spring事务管理：
+一、通过xml配置
+	applicationContext.xml中配置如下：
+		<!--4. 配置事务管理器，依赖数据源 -->
+		<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref="dataSource"/>
+		</bean>
+		<!-- 5.编写通知： 对事务进行增强，需要编写对切入点和具体执行事务细节 -->
+		<tx:advice id="txAdvice" transaction-manager="transactionManager">
+			<tx:attributes>
+				<!-- name处的* 表示任意方法名称
+					propagation 事务的传播行为
+					isolation 事务隔离级别
+				 -->
+				<tx:method name="*" propagation="REQUIRED" isolation="DEFAULT" read-only="false"/>
+			</tx:attributes>
+		</tx:advice>
+		<!-- 6.编写AOP，让spring自动对目标生成代理，需要使用aspectJ的表达式 -->
+		<aop:config>
+			<!-- 切入点 -->
+			<aop:pointcut expression="execution(* com.lw.spring.springframework.jdbc.*.*(..))" id="txPointCut"/>
+			<!-- 切面： 将切入点与通知整合 -->
+			<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+		</aop:config>
+	备注：此处要注意切点表达式的配置 execution(* com.lw.spring.springframework.jdbc.*.*(..))
+	如果改为   jdbc.*.*.*(..) 有三个* 那么就不会管理jdbc包下面的事务，而是管理jdbc.proxy这种包下面的事务
+	
+	测试类编写：
+	CustomerDaoImpl:
+		public void operCustomer(String sql,Object[] params) throws Exception {
+			jt.update(sql,params);
+	//		int i = 1/0;
+			jt.update(sql,params);
+		}
+	备注：依靠容器注入jt需要有setter方法，否则反射不进去。
+	此时如果调用operCustomer方法，就会为它开启一个事务。
+
+二、通过注解方式实现：
+	applicationContext.xml中配置：
+	 将5，6两点替换 
+	 	<!-- 5.编写通知： 对事务进行增强，需要编写对切入点和具体执行事务细节 -->
+	 	<!-- 6.编写AOP，让spring自动对目标生成代理，需要使用aspectJ的表达式 -->
+	 替换为：
+	 	<tx:annotation-driven transaction-manager="transactionManager"/>	
+	
+	注解使用@Transactional
+		@Transactional放在类上，表示对这个类的所有方法事务管理
+		@Transactional放在方法上，表示仅仅对这个方法事务管理
+	列子：CustomerDaoImpl.java
+		@Transactional(propagation=Propagation.REQUIRED,
+			isolation=Isolation.DEFAULT,readOnly=false)
+		@Override
+		public void operCustomer(String sql,Object[] params) throws Exception {
+			jt.update(sql,params);
+			int i = 1/0;
+			jt.update(sql,params);
+		}
+	
+	
