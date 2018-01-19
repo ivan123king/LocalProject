@@ -1,0 +1,55 @@
+Java各种加密解密的代码
+	类说明：
+		java.security.Provider Java中提供者类
+		java.security.Security Java中管理提供者类的类
+		java.security.MessageDigest 继承MessageDigestSpi类，实现消息摘要算法
+			目前Java7支持的消息摘要算法： MD2,MD5,SHA-1(SHA),SHA-256,SHA-384,SHA-512
+		java.security.DigestInputStream  流式消息摘要方式类
+		java.security.DigestOutputStream 流式消息摘要方式类
+	MessageDigestTest  生成消息摘要的测试类
+		
+		java.security.Key(Interface) 所有秘钥接口的顶层接口
+			其中SecretKey,PublicKey,PrivateKey三大接口定义了对称秘钥和非对称秘钥 (Interface)
+		java.security.AlgorithmParameters 提供密码参数的不透明表示
+			不透明： 不可以直接访问各参数域，只能得到与参数集相关联的算法名及该参数集的某类编码
+	DigitalSignature   生成呢验证数字签名的类
+		KeyPairGenerator,KeyPair,Signature
+	
+		java.security.SignedObject 用来创建实际运行时对象的类
+	SignedObjectTest   同DigitalSignature，也是用来创建数字签名的类
+	
+		java.security.Timestamp 封装有关签署时间戳的信息，且不可改变
+	TimestampTest  需要一个x.cer是一个数字证书文件，Timestamp是时间戳，还有其他创建方式,Date
+	
+	java.security.CodeSigner 封装了代码签名者的信息，不可变，称之为代码签名
+		案例： CodeSignerCase
+		
+	java.security.KeyStore 被称为密钥库，用于管理密钥和证书的存储。
+		证书类型： KeyStore.getDefaultType()  找到这个文件：C:\Program Files\Java\jdk1.8.0_111\jre\lib\security\java.security
+		案例： KeyStoreCase
+	
+	javax.crypto.Mac 安全消息摘要类，必须有一个由发送方和接收方共享的秘密密钥才能生成最终消息摘要  对比MessageDigest
+		案例： MacCase
+	
+	javax.crypto.KeyGenerator  同KeyPairGenerator(security包)相似，用来生成秘密密钥
+		案例： MacCase
+	
+	javax.crypto.KeyAgreement 提供密钥协定协议的功能
+		案例： KeyAgreementCase
+	
+	javax.crypto.SecretKeyFactory 同KeyFactory,用于产生秘密密钥	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
