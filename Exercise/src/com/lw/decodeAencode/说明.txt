@@ -38,8 +38,87 @@ Java各种加密解密的代码
 		案例： KeyAgreementCase
 	
 	javax.crypto.SecretKeyFactory 同KeyFactory,用于产生秘密密钥	
+		案例： SecretKeyFactoryCase
+	
+	javax.crypto.Cipher  为加密解密提供密码功能
+		案例： CipherCase  加包和解包，对密钥等操作
+						加密，解密，对数据的操作
+						
+	javax.crypto.CipherInputStream
+	javax.crypto.CipherOutputStream  属于Cipher扩展类
+		案例： 加密 ：CipherInputStreamCase		Cipher.DECRYPT_MODE
+			解密： CipherOutputStreamCase		Cipher.ENCRYPT_MODE
+			
+	javax.crypto.SealedObject 用加密算法创建对象并保护其机密性
+		案例： SealedObjectCase  不安全
+			
+	javax.crypto.SecretKeySpec  用于构建秘密密钥规范
+		byte[] key = secretKey.getEncoded();
+		//通过密钥编码字节数组还原秘密密钥  DES是生成secretKey的算法，需要根据情况改变
+		SecretKey secretKey2 = new SecretKeySpec(key,"DES");
+	
+	java.security.cert.Certificate
+	java.security.cert.CertificateFactory  有关证书的操作类
+		案例; CertificateCase
+	
+	java.security.cert.CRL   证书撤销列表，也就是无效证书的列表
+		案例： CRLCase
 		
+	SSLSocketCase   SSL握手连接
+	
+	org.bouncycastle.util.encoders.Base64  Base64编码解码
+		案例： Base64Case 需要bcprov-jdk15on-159.jar
+		jar包下载地址：http://www.bouncycastle.org/latest_releases.html
+	
+	org.bouncycastle.util.encoders.UrlBase64  UrlBase64编码，编码后和Base64一样
+		案例： UrlBase64Case 需要bcprov-jdk15on-159.jar
 		
+	org.bouncycastle.util.encoders.Hex 用于16进制编码
+		案例： HexCase
+		
+	org.apache.commons.codec.binary.Base64	base64编码
+		案例: CommonBase64Case 需要: commons-codec-1.11.jar 
+		下载地址： Commons Codec辅助工具下载
+		和Bouncy Castle Base64编码不同之处在于，Bouncy Castle使用"."符号替代"="进行补位
+		而Commons Codec不进行补位
+		
+	org.apache.commons.codec.binary.Base64InputStream 
+	org.apache.commons.codec.binary.Base64OutputStream
+		Base64输入流和输出流支持
+		案例：  CommonBase64StreamCase
+	
+	org.apache.commons.codec.digest.DigestUtils   对MessageDigest的二次封装，提供更便捷更多方式消息摘要	
+	
+	java.util.zip.CRC32  循环冗余校验（Cyclic Redundancy Check） 一般在压缩数据中
+		案例： CRC32Case
+	
+	AlgorithmCase  是一些基本算法案例
+		idea  目前很难破解的对称加密算法，基于密钥
+		pbe   基于口令的对称加密算法
+		dh算法： 基于密钥的非对称加密算法
+			DH算法说明：
+				1. 甲方生成公钥私钥，将公钥发送给乙方
+				2. 乙方根据甲方的公钥生成公钥私钥，将公钥发送给甲方
+				3. 甲方根据乙方的公钥和甲方的私钥生成私密密钥
+				4. 乙方根据甲方的公钥和乙方的私钥生成私密密钥
+				5. 甲方用自己的私密密钥加密
+				6. 乙方用自己的私密密钥解密
+			原因： 甲方私密密钥==乙方私密密钥，所以才能做到解密
+		rsa: 基于密钥的非对称加密算法，
+			1. 甲方构建公钥，私钥，公钥发送给乙方
+			2. 甲方使用私钥加密数据发送给乙方
+			3. 乙方使用公钥解密数据
+			4. 乙方使用公钥加密数据发送给甲方
+			5. 甲方使用私钥解密数据
+			缺点： 公钥是公布的，所以任何人都可以伪装成乙方
+		elgamal: 基于密钥的非对称加密算法
+			流程等同于rsa算法，只不过密钥对的构建由乙方完成
+	
+	Sun Java Cryptography Extension(JCE) Unlimited Strenght Jurisdiction Policy File 下载地址
+		http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
+	
+	Commons Codec辅助工具下载：
+		http://commons.apache.org/proper/commons-codec/	
 		
 		
 		

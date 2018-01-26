@@ -2,11 +2,16 @@ package com.lw.decodeAencode.classcase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * 消息摘要
@@ -15,15 +20,18 @@ import java.security.NoSuchAlgorithmException;
  */
 public class MessageDigestTest {
 
-	public static void main(String args[]) throws NoSuchAlgorithmException{
+	public static void main(String args[]) throws NoSuchAlgorithmException, FileNotFoundException{
 		//待做消息摘要算法的原始信息
-		byte[] input = "sha".getBytes();
+		byte[] input = "有点大".getBytes();
 		//初始化MessageDigest对象，将使用SHA算法
 		MessageDigest sha = MessageDigest.getInstance("MD5");
 		//更新摘要信息
 		sha.update(input);
 		//获取消息摘要结果
 		byte[] output = sha.digest();
+		
+		String o = Hex.toHexString(output);
+		System.out.println(o);
 		
 //		sha.update("sha".getBytes());
 //		byte[] output2 = sha.digest();

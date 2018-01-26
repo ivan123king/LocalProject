@@ -36,5 +36,6 @@ public class SecretKeyFactoryCase {
 		if(new String(secretKey.getEncoded()).equals(new String(secretKey02.getEncoded()))) 
 			System.out.println("秘密密钥还原成功");
 		
+		
 	}
 }
