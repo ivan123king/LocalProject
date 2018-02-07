@@ -1,0 +1,27 @@
+Netty框架的练习目录：
+	需要jar包： netty-all-XXX(版本).jar
+	下载地址： http://netty.io/ 官网的downloads下有
+	
+EchoClient.java   客户端启动
+EchoClientHandler.java  客户端信息处理类
+EchoServer.java   服务端启动类
+EchoServerHandler.java  服务端信息处理类
+上面四个类构成最简单的一个netty服务端和客户端结构
+
+websocket包是构建websocket的服务端代码
+	ChatServer.java 是启动服务端的入口
+	ChatServerInitializer.java  是在服务端中的chatpipeline中添加一系列的handler
+	HttpRequestHandler.java  是访问服务器时返回给一个页面，采用读取html然后回写给浏览器方式，并不是直接可以访问html
+	TextWebSocketFrameHandler.java 是接收客户端发送的信息，然后回写信息
+	
+	如果要添加服务端加密：
+		SecureChatServer.java 继承了ChatServer.java
+		SecureChatServerInitializer.java 继承了 ChatServerInitializer.java 
+			在createInitializer方法中调用super.createInitializer()方法，所以能够添加
+		ChatServerInitializer类中的Handler到ChannelPipeline中
+		
+		加密的入口就是SecureChatServer.java
+
+
+小记：
+Linux上java调用外部Jar包： http://blog.csdn.net/u012865381/article/details/52171197 
