@@ -3,7 +3,22 @@
 CellularAutomata  栅栏模型代码
 Renderer   ExecutorCompletionService的应用，并行下载图片
 
-
-
 java swing做的超级马里奥： https://github.com/w1014804721/SuperMario
+
+线程返回结果：
+方式一：回调  CallbackDigest.java   CallbackDigestUserInterface.java
+	CallbackDigest.java 是一个实现了Runnable接口的线程，其中有一个计算num3=num1+num2的结果，那么怎么把这个计算结果num3
+返回给调用者?
+	CallbackDigestUserInterface是启动上面线程的主线程，它需要知道计算结果。
+方式是使用回调，在CallbackDigest中CallbackDigestUserInterface.receiveData(num3);如此将结果传递出去。
+
+方式二： 组合  InstanceCallbackDigest.java InstanceCallbackDigestUserInterface.java
+	InstanceCallbackDigestUserInterface中main方法调用InstanceCallbackDigest，但是每次都初始化
+InstanceCallbackDigestUserInterface并且传递到InstanceCallbackDigest中，这样就不用使用静态方式。
+
+线程拆解： FindMaxTask.java  MultithreadedMaxFinder.java
+	求一个数组里最大值，将此任务拆解为两个，第一个求，0~data.length/2的数组最大值，第二个求data.length/2~data.length
+范围的最大值，最后将此两个最大值比较。
+	用到Callable接口，ExecutorService,Future
+
 
