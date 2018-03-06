@@ -22,6 +22,34 @@ websocket包是构建websocket的服务端代码
 		
 		加密的入口就是SecureChatServer.java
 
+udp是netty处理UDP协议数据
+	LogEventBroadcaster类是启动入口，监听一个文件，如果此文件增加了数据那么就读取数据，writeAndFlush后，
+	就会转到LogEventEncoder中方法做处理，将此文件名和增加的内容信息放在出站list中
+	
+	LogEventBroadcaster读取数据，然后由于LogEventEncoder在channelPipeline中，所以会得到发送过来的数据，
+	LogEventEncoder将数据写入站中。
+	有将数据写入站中，那么必然后从站中读取数据的类，就是LogEventMonitor和LogEventDecoder类，
+	LogEventMonitor类绑定了和LogEventBroadcaster启动是一样的端口，目前是9999，所以Monitor类一直在监控9999端口
+	的数据，当有数据从这个端口写入到站中，就会读取，此时同样由于LogEventDecoder在Moniter类的channelPipeline，它会
+	得到数据，然后将数据从站中读取出来；
+	
+	简化流程如下：
+	启动(LogEventBroadcaster   9999端口)-->读取日志文件有新数据-->数据写入站中(LogEventEncoder)
+	启动(LogEventMonitor  监听9999端口)--->发现站中有数据--->从站中读取数据(LogEventDecoder)
+	
+	PS: LogEventEncoder和LogEventDecoder继承关系如下，所以他们都是Handler,可以被放在ChannelPipeline
+	LogEventEncoder-->MessageToMessageEecoder-->ChannelOutboundHandlerAdapter
+	LogEventDecoder-->MessageToMessageDecoder-->ChannelInboundHandlerAdapter
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 小记：
 Linux上java调用外部Jar包： http://blog.csdn.net/u012865381/article/details/52171197 
