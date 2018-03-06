@@ -1,0 +1,20 @@
+一些需要注意点的目录
+
+
+Sub.java  Super.java
+	Sub是Super的子类	
+	如果运行Sub类里面的main方法，由于超类的构造器会优先于子类构造器执行，所以会先执行Super,Super的构造器中调用的
+	over()方法是子类中的over()方法，此时输出null
+	等子类Sub的构造器完成对num的初始化，over()方法才输出now.
+	
+	注意： 超类构造器优先于子类构造器执行;
+		超类中调用的方法其实是子类中方法。
+
+Stack.java 是一个类的泛型化。
+MethodG.java  是泛型化的方法。
+FactoryG.java  泛型单例工厂，返回一个泛型的单例接口。  
+			   方法返回时继承泛型接口
+
+Planet.java 是枚举类型中定义方法等。
+Operation.java  是在枚举中定义抽象方法并自己实现
+OperationTwo.java  在上述代码中额外增加了symbol标志符，需要自己实现构造方法
