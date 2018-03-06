@@ -1,0 +1,24 @@
+Java网络编程的目录
+
+FormPoster：
+	是用来模拟请求Post提交方式给一个网站的，使用到URL，URLConnection类
+QueryString:
+	此类是封装了查询数据的类，其中需要用到URLEncoder类来给查询参数编码，防止一些恶意参数。
+	
+SourceViewer.java:
+	此类是使用HttpURLConnection访问页面，获取页面返回信息
+	
+EchoServer.java:
+	这是一个非阻塞的异步网络编程，如果是阻塞的需要使用accept()方法。
+	此处比较可以参考《Netty实战》此书的第4章传输，39页详细描述了将一个阻塞的改写成一个非阻塞异步的代码复杂度，
+	同时阐述了使用Netty进行改写的便捷度。
+	
+SecureOrderTaker.java：
+	是对Socket进行安全加密的连接方式代码。
+
+UDPDataClient,UDPDataServer 是简易的UDP数据报服务端和客户端案例。
+其他UDP开头的类是一些应用案列，比如添加循环，线程等。
+
+备注： 手工编译代码时如果报错： 编码GBK的不可映射字符，就指定自己的字符格式
+	javac -encoding UTF-8 xxx.java
+	java xxx
