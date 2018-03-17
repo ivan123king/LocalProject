@@ -1,0 +1,5 @@
+Client端和spring整合
+1.加入spring需要的jar包
+2.配置spring的配置文件applicationContext-Xxx.xml
+3. 获取接口，调用服务 App.java
+
