@@ -1,0 +1,36 @@
+问题一：严重: Servlet.service() for servlet [dispatcherServlet] in context with path [/ssm] threw exception [The absolute uri: [http://java.sun.com/jsp/jstl/core] cannot be resolved in either web.xml or the jar files deployed with this application] with root cause
+org.apache.jasper.JasperException: The absolute uri: [http://java.sun.com/jsp/jstl/core] cannot be resolved in either web.xml or the jar files deployed with this application	
+	原因： 虽然maven项目中加载了jstl的jar包，但是发布的时候没有发布到tomcat中，所以需要手动将jstl的2个jar包拷贝到tomcat的lib中
+	
+问题二： customer.jsp页面不支持el表达式
+	原因： web.xml中如下，此处表明是2.3版本，2.3默认不支持el表达式
+	<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+ 	解决方法一： 提升为更高版本
+ 	解决方法二： 在customer.jsp中添加 isELIgnored="false" 表示支持el表达式
+
+问题三： Error creating document instance.  Cause: org.xml.sax.SAXParseException; lineNumber: 25; columnNumber: 14; 元素类型为 "include" 的内容必须匹配 "EMPTY"。	
+现象： CustomerMapper.xml中如果写成 如下格式就报上面的错误
+	select
+			<include refid="customer_c">
+				<property name="item" value="c"></property>
+			</include>
+		from customer c
+原因： mybatis的jar包的版本问题,使用3.2.1变成3.4.4后正常
+
+问题四：org.mybatis.spring.transaction.SpringManagedTransaction.getTimeout()Ljava/lang/Integer;
+原因： mybatis和spring整合时包等级不对应
+MyBatis-Spring	    MyBatis	           Spring
+1.0.0 and 1.0.1	    3.0.1 to 3.0.5	   3.0.0 or higher
+1.0.2	3.0.6	    3.0.0 or higher    
+1.1.0 or higher	    3.1.0 or higher	   3.0.0 or higher
+1.3.0 or higher	    3.4.0 or higher	   3.0.0 or higher
+通过这个对应关系来选择你需要的mybatis-spring jar 包的版本
+所以 mybatis的包变为3.4.4后mybatis-spring的整合包需要使用1.3版本以上的
+
+
+
+
+
+
