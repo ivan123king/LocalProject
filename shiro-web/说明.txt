@@ -1,0 +1,98 @@
+一、与spring整合
+在已经能正常运行spring和springMVC情况下加入shiro
+1. web.xml中添加shiroFilter
+	<filter>
+        <filter-name>shiroFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+     <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+ 
+2.编写spring的applicationContext.xml
+3.编写自定义的CustomerRealm.xml
+4.添加ehcache.xml和jar包
+	ehcache.xml在shiro-ehcache.jar中找到的
+	ehcache.jar是hibernate中找到的 D:\jar\hibernate-release-5.2.12.Final\lib\optional\ehcache
+
+用户认证：
+1. CustomerRealm 继承AuthenticatingRealm
+2. 	doGetAuthenticationInfo方法中返回一个AuthenticationInfo，其中包装了数据库用户名，密码
+	AuthenticationInfo info = new SimpleAuthenticationInfo(principal, credentials, realmName);
+		principal  等同于 username
+		credentials 等同于password
+	如果登录的用户名和密码和包装在info中返回的相同就认证通过。
+	
+配置多个realm: 把realm理解为拦截器，校验器，过滤器就行
+需要修改spring的配置文件：
+	1.新增 authenticator 的配置
+	2. 修改securityManager为如下格式
+	 <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="sessionMode" value="native"/>
+        <property name="authenticator" ref="authenticator"/>
+    </bean>
+    
+   	 第二种方法：直接在<bean id="securityManager">添加对应的realm执行顺序
+		<property name="realms">
+			<list>
+				<ref bean="jdbcRealm"/>
+				<!-- <ref bean="jdbc02Realm"/> -->
+				<!-- <ref bean="jdbc03Realm"/> -->
+			</list>
+		</property>		
+		去掉配置的<property name="authenticator" ref="authenticator"/>
+		和<bean id="authenticator">
+
+修改多个Realm的认证策略：
+	何谓认证策略？就是多个Realm认证时是一个认证通过算通过还是所有一起认证通过才算是通过。
+	认证策略有如下三种：
+	FirstSuccessfulStrategy   只要有一个Realm验证成功即可，返回第一验证成功的Realm的验证信息
+	AtLeastOneSuccessfulStrategy[默认]  只要有一个Realm验证成功即可，返回所有验证成功的Realm的验证信息
+	AllSuccessfulStrategy  所有Realm都验证成功才算成功，返回所有验证成功的Realm的验证信息
+	需要在applicationContext.xml中对<bean id="authenticator">添加如下配置：
+	<!-- 认证策略 -->
+		<property name="authenticationStrategy">
+			<bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy"/>
+		</property>
+	
+前面是认证，即是否登录，那么登录后需要看是否有对应权限访问某些资源，下面就是授权
+1.在applicationContext.xml中配置对应页面访问角色
+	/user.jsp = roles[user]
+    /admin.jsp = roles[admin]	
+ 	此时如果访问user.jsp那么就需要登录者拥有user的角色，访问admin.jsp就需要登录者有admin的角色
+	既然已经配置了，那么如何确定一个用户是否拥有某个角色呢？这个就需要在对应的Realm中设置，看CustomerAuthorizingRealm中
+的doGetAuthorizationInfo()方法，返回的AuthorizationInfo就是此登录用户的拥有角色。
+	如果没有对应权限就会跳转到applicationContext.xml中配置的unauthorizedUrl
+
+shiro标签：作用于jsp页面
+	看index.jsp
+1.引入标签库 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+2.标签设置，此处如果有user角色就会展示连接，否则不会展示，其他标签作用百度。
+	<shiro:hasRole name="user">
+		<a>user权限连接</a>
+	</shiro:hasRole>	
+	
+权限注解：在一个方法上注解
+	看 ShiroServce.java，其他注解具体使用和扩展使用百度
+	@RequiresRoles(value={"user"})	拥有user角色就可以访问此方法，否则抛出异常
+
+applicationContext.xml中不可能在生产上每次都修改配置文件配置，此时可以从数据库配置获取
+	/login.jsp = anon
+	/shiro/logout = logout
+	/user.jsp = roles[user]
+	/admin.jsp = roles[admin]
+	/** = authc
+1. 注释掉applicationContext.xml中filterChainDefinitions property配置
+2.增加如下配置
+	<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"/>
+	<bean id="filterChainDefinitionMap" factory-bean="filterChainDefinitionBean" factory-method="filterChainDefinitionBuilder"/>
+    <bean id="filterChainDefinitionBean" class="com.lw.shiro.service.FilterChainDefinitionBean"/>
+	项目启动后就会访问FilterChainDefinitionBean中的filterChainDefinitionBuilder()方法，得到这些页面的配置
+	
+	

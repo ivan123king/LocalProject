@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+">
+	<!--shiro的安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+        <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
+        <property name="sessionMode" value="native"/>
+        <!-- <property name="realm" ref="jdbcRealm"/> 如果配置了多个realm那么这一句单独的realm的配置就可以去掉了 -->
+        <property name="authenticator" ref="authenticator"/>
+        
+        <property name="realms">
+			<list>
+				<ref bean="jdbcRealm"/>
+				<!-- <ref bean="jdbc02Realm"/> -->
+				<!-- <ref bean="jdbc03Realm"/> -->
+			</list>
+		</property>
+        
+    </bean>
+
+    <!--缓存管理： 需要ehcache的jar包和xml配置文件-->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/> 
+    </bean>
+
+	<!-- 多个realm的执行策略，即这些realm执行顺序 -->
+	<bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+		<property name="realms">
+			<list>
+				<ref bean="jdbcRealm"/>
+				<!-- <ref bean="jdbc02Realm"/> -->
+				<!-- <ref bean="jdbc03Realm"/> -->
+			</list>
+		</property>
+		<!-- 认证策略 -->
+		<property name="authenticationStrategy">
+			<bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy"/>
+		</property>
+	</bean>
+
+    <!--此处使用自定义的Realm-->
+    <bean id="jdbcRealm" class="com.lw.shiro.realm.CustomerRealm">
+    	<!-- 
+    		密码匹配器
+    		会将前台输入的密码进行MD5加密后匹配数据库密码
+    	 -->
+    	<property name="credentialsMatcher">
+    		<bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+    			<property name="hashAlgorithmName" value="MD5"/>
+    		</bean>
+    	</property>
+    </bean>
+
+    <!--管理bean的生命周期 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- Enable Shiro Annotations for Spring-configured beans.  Only run after
+         the lifecycleBeanProcessor has run: -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+    <!-- Define the Shiro Filter here (as a FactoryBean) instead of directly in web.xml -
+         web.xml uses the DelegatingFilterProxy to access this bean.  This allows us
+         to wire things with more control as well utilize nice Spring things such as
+         PropertiesPlaceholderConfigurer and abstract beans or anything else we might need: -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"/>
+        
+        <!-- <property name="filterChainDefinitions">
+            <value>
+            	受保护的页面
+            		anon  可以匿名访问的页面
+            		autho 需要登录后才能访问的页面，如果没有登录会自动定向到loginUrl
+            		logout 登出的url拦截器
+            		roles 角色拦截器，访问对应url需要对应角色
+            	
+                /login.jsp = anon
+                /shiro/logout = logout
+                # allow WebStart to pull the jars for the swing app:
+                /*.jar = anon
+                /user.jsp = roles[user]
+                /admin.jsp = roles[admin]
+                # everything else requires authentication:
+                /** = authc
+            </value>
+        </property>  -->
+    </bean>
+    
+    <bean id="filterChainDefinitionMap" factory-bean="filterChainDefinitionBean" factory-method="filterChainDefinitionBuilder"/>
+    <bean id="filterChainDefinitionBean" class="com.lw.shiro.service.FilterChainDefinitionBean"/>
+</beans>
