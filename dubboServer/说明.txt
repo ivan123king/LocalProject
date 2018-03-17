@@ -1,0 +1,52 @@
+dubbo分布式框架的Server端
+服务启动入口是App
+启动需要jar包：
+	dubbo.jar,javassist.jar,netty.jar
+其中dubbodemoApi.jar是dubbo分布式中API需要自己动手打的jar
+
+dubboClient dubboServer dubboApi三者构成分布式框架
+
+API定义接口，但没有具体实现，将接口打包成jar后分别给Server和Client
+Server是服务提供者，提供具体服务
+Client是调用者，通过API的jar包得到接口，然后实际上调用的是Server的实现，本地没有具体实现
+
+使用zookeeper作为注册中心：
+1.下载zookeeper
+2. 配置zookeeper
+	a.D:\tools\zookeeper-3.4.11\conf 目录下的zoo_sample.cfg 改成zoo.cfg
+	b.修改zoo.cfg中日志存放位置  dataLogDir=D://tools//zookeeper-3.4.11//data//log
+	c.修改zoo.cfg中服务存放位置  dataDir=D://tools//zookeeper-3.4.11//data//address
+	d.修改端口  clientPort=2181
+3. 修改代码dubboClient中启动入口App.java地址为zookeeper://192.168.0.101:2181
+4. 修改代码dubboServer中启动入口App.java地址为zookeeper://192.168.0.101:2181
+5. 项目中添加zookeeper的依赖jar包
+	<!-- https://mvnrepository.com/artifact/com.101tec/zkclient -->
+	<dependency>
+	    <groupId>com.101tec</groupId>
+	    <artifactId>zkclient</artifactId>
+	    <version>0.10</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
+	<dependency>
+	    <groupId>org.apache.zookeeper</groupId>
+	    <artifactId>zookeeper</artifactId>
+	    <version>3.4.11</version>
+	    <type>pom</type>
+	</dependency>
+6. 启动zookeeper   windows下在bin/zkServer.cmd  linux运行  zkServer.sh
+PS： 需要log4j.properties文件和相应jar包
+
+不使用注册中心：
+dubboServer  App.java 出增加 registry.setRegister(false);//不把服务注册到注册中心
+dubboClient  App.java reference.setRegistry(registry); 改为
+					reference.setUrl("dubbo://127.0.0.1:22800/com.lw.dubbo.IUserService")
+						dubbo是Server端中代码写的协议名称  protocol.setName("dubbo");
+						127.0.0.1:22800 是协议所在地址
+						后面是api中的类路径，接口所在地，不是实现类所在地
+	
+	
+
+
+
+
+
