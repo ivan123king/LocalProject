@@ -9,14 +9,15 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
   <servlet>
     <description></description>
-    <display-name>UploadWordServlet</display-name>
-    <servlet-name>UploadWordServlet</servlet-name>
-    <servlet-class>com.lw.controller.UploadWordServlet</servlet-class>
+    <display-name>ImageUploadServlet</display-name>
+    <servlet-name>ImageUploadServlet</servlet-name>
+    <servlet-class>com.lw.blog.controller.ImageUploadServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>UploadWordServlet</servlet-name>
-    <url-pattern>/UploadWordServlet</url-pattern>
+    <servlet-name>ImageUploadServlet</servlet-name>
+    <url-pattern>/blog/imageupload.action</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -1,8 +1,7 @@
 package mybatis.mybatis;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Connection;
 
 import junit.framework.TestCase;
 
@@ -27,6 +26,7 @@ public class SimpleTestCase extends TestCase {
 		CustomerMapper customerMapper = (CustomerMapper) sqlSession.getMapper(CustomerMapper.class);
 		
 		
+		Connection conn = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
 		SQL sql = new SQL();
 		sql.SELECT("c.customer_id,c.customer_id");
 		sql.SELECT("t.id as item_id,t.name as item_name");

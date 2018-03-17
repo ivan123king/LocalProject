@@ -26,7 +26,6 @@ public class HtmlUtil {
 		// 遍历
 		StringBuffer content = new StringBuffer();
 		content.append(listNode(word));
-		System.out.println(content.toString());
 		return content.toString();
 	}
 

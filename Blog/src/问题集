@@ -17,3 +17,37 @@
 	null 正文
 	其他格式正文
 
+三、 HTML的table展示文字是去掉空格的
+	在<td><pre>XXXX</pre></td> 使用pre标签保留空格
+
+四、乱码问题
+	1、 接收jsp中文打印在后台乱码
+	处理方式：在接收前request.setCharacterEncoding("UTF-8");
+	String blogContent = request.getParameter("content");  然后此处就不是乱码
+	
+	2、后台servlet中request.getRequestDispatcher().include()到页面乱码
+	response.setContentType("text/html;charset=utf-8");  加上此段代码在跳转前
+	原因： 
+	forward在调用者程序中设置的响应状态码和响应头不会被忽略,在被调用者程序中设置的响应状态码和响应头也不会被忽略. 
+	include会被忽略.. 这也是乱码的一个原因.. 
+	所以使用include将这些编码设置都清除了，需要手动设置
+	
+五、ckeditor上传图片缺少图像源文件地址
+	原因，回调函数中地址错误：
+	错误地址： /Blog\upload\images\CKEDITOR_c24fd977beb64b0ca04302dc8a8fe7f3.png
+	正确地址：/Blog/upload/images/CKEDITOR_1c43620b34dc4b3280c5f66572796cec.png
+
+六、启动tomcat报错：java.util.concurrent.ExecutionException: org.apache.catalina.LifecycleException
+	原因： 使用注解配置了@WebServlet("/blog/writeblog.action")的访问路径，
+		同时还在web.xml使用<servlet>又配置了此类，导致tomcat启动时无法知道应该使用哪个配置
+
+七、使用bootstrap-fileupload控件上传文件图标显示不全
+	原因：bootstrap.css中请求fonts(font-face标签)中字体是使用../fonts....这种，我的fonts是放在blog/fonts目录下
+		而bootstrap.css放在了css目录下，结果请求fonts目录下去了	
+	解决方法：在WebContent下建立一个fonts目录用来存放字体	
+
+八、 文件上传不是工程WebContent/upload目录下
+	原因：更换了tomcat后没有勾选tomcat面板的 Serve modules without publishing 这个选项，
+		导致一直在tomcat中发布项目
+	解决方法： 双击Servers中的tomcat，在打开的面板下方勾选此选项
+	

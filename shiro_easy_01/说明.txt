@@ -1,0 +1,19 @@
+shiro框架学习工程
+shiro官网     http://shiro.apache.org
+一、简单入门
+	1.新建一个java project项目
+	2.添加jar包
+		jcl-over-slf4j-1.7.25.jar
+		log4j-1.2.17.jar
+		shiro-all-1.3.2.jar
+		slf4j-api-1.7.25.jar
+		slf4j-log4j12-1.7.25.jar
+	3.加入shiro配置文件
+		shiro.ini,log4j.properties
+	4.编写hello world代码
+		com.lw.easy_example.Quickstart
+
+二、 与spring进行整合
+见shiro-web
+
+

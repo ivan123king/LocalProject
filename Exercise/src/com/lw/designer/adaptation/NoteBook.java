@@ -17,6 +17,8 @@ public class NoteBook {
 	
 	
 	public static void main(String[] args) {
+//		GBTwoPlug two = new GBTwoPlug();
+//		ThreePlug plug = new TwoPlugAdapter(two);
 		ThreePlug plug = new TwoPlugAdapterExtends();
 		NoteBook nb = new NoteBook(plug);
 		nb.change();

@@ -18,3 +18,4 @@ FactoryG.java  泛型单例工厂，返回一个泛型的单例接口。
 Planet.java 是枚举类型中定义方法等。
 Operation.java  是在枚举中定义抽象方法并自己实现
 OperationTwo.java  在上述代码中额外增加了symbol标志符，需要自己实现构造方法
+PayrollDay.java  一个付工资的枚举类，枚举中定义私有枚举类，然后调用内部枚举方法。

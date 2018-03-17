@@ -11,6 +11,11 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 public class OtherUtil {
 
@@ -30,6 +35,21 @@ public class OtherUtil {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString().replaceAll("-", "");
 	}
+	
+	private static SessionFactory sessionFactory = null;
+	public static Session createSession(){
+		Session session = null;
+		if(sessionFactory==null||sessionFactory.isClosed()){
+			Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+			ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+								.applySettings(configuration.getProperties())
+								.buildServiceRegistry();
+			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		}
+		session = sessionFactory.openSession();
+		return session;
+	}
+	
 
 	public static final String proPath = "/com/lw/utils/character.properties";
 
