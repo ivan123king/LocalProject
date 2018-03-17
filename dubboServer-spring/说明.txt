@@ -1,0 +1,7 @@
+dubbo和Spring整合
+此处是Server端整合
+
+1.将spring需要的jar包加入进来
+2.配置spring的配置文件applicationContext-XXX.xml
+3.App.java启动，此时启动不需要写一堆代码，所有都配置在spring的配置文件中
+
