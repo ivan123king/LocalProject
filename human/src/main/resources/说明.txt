@@ -1,0 +1,14 @@
+表中status字段，0正常数据，1异常数据
+
+2018-04-15:
+	1.粗略完成blog和user关联，select,insert
+	
+2018-04-22:
+	1. 完成blog的Service层和Dao层的对博客的通过blogId更新，逻辑删除，物理删除
+	2. BlogController中listblog查询登录用户写的博客
+	3. Blog实体类中JsonField是使用fastjson将对象json化的注解
+
+
+
+
+

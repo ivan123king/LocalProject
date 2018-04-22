@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!-- 配置别名 -->
+	<typeAliases>
+		<package name="com.lw"/>
+	</typeAliases>
+
+	<!-- 本来是要配置数据源信息的，但是此处放在了spring的配置文件中 -->
+
+	<!-- 配置Mapper的位置 -->
+	<mappers>
+		<!-- 
+		此处指定加载此包下面的所有Mapper.xml
+			如果只需要加载某个Mapper.xml使用mapper节点的resource=com/lw/dao/mapper/Mapper.xml
+		<package name="com.lw.dao.mapper"/>
+		 -->
+	</mappers>
+
+</configuration>

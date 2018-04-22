@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lw.user.dao.mapper.CustomerMapper">
+
+	<!-- 指定表中列值和类中列对应关系 -->
+	<resultMap id="BaseResultMap" type="com.lw.user.bean.Customer">
+		<id column="customer_id" property="customerId" jdbcType="INTEGER" />
+		<result column="customer_name" property="customerName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<sql id="customer_c">
+		${item}.customer_id ,${item}.customer_name
+	</sql>
+	<select id="findCustomerWithID" parameterType="java.lang.String"
+		resultMap="BaseResultMap"
+		useCache="true">
+		select
+			<include refid="customer_c">
+				<property name="item" value="c"></property>
+			</include>
+		from customer c
+		<where>
+			c.ID = #{ID}
+		</where>
+	</select>
+
+	<insert id="addNewCustomer"  parameterType="com.lw.user.bean.Customer">
+		insert into customer(customer_id,customer_name,age,birthday,address,ID)
+		values(#{customerId},#{customerName},#{age},#{birthday},#{address},#{ID})
+	</insert>
+	
+	
+	<update id="updateCustomerById" parameterType="com.lw.user.bean.Customer" flushCache="false">
+		update customer c 
+		<!-- SET 的配置 如果有多个条件语句会自动去掉最后一个逗号 -->
+		<set>
+			<if test="customerName!=null and customerName!=''">
+				c.customer_name = '${customerName}'
+			</if>
+		</set>
+		<where>
+			c.customer_id = #{customerId}		
+		</where>
+	</update>
+	
+	<delete id="deleteByCustomerId" parameterType="java.util.List">
+		delete from customer where customer_id in 
+		<!-- 循环取出此list中值 -->
+		<foreach collection="list" separator="," item="value" open="(" close=")" index="index">
+			<!-- trim节点的作用是防止出现 (, 或  ,) 这种格式 -->
+			<trim prefix="(" suffix=")" prefixOverrides=",">
+				#{value}
+			</trim>
+		</foreach>
+	</delete>
+
+</mapper>

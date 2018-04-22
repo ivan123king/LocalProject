@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lw.blog.dao.mapper.BlogMapper">
+	<!-- 指定表中列值和类中列对应关系 -->
+	<resultMap id="BaseResultMap" type="com.lw.blog.bean.Blog">
+		<id column="blog_id" property="blogId" jdbcType="INTEGER" />
+		<result column="user_id" property="userId"
+			jdbcType="INTEGER" />
+		<result column="content" property="content"
+			jdbcType="CLOB" />
+		<result column="blog_date" property="blogDate"
+			jdbcType="DATE" />
+		<result column="labels" property="labels"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="blog_c">
+		${item}.blog_id ,${item}.user_id,${item}.content,${item}.blog_date
+	</sql>
+	<select id="findBlogByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap"
+		useCache="true">
+		select
+			<include refid="blog_c">
+				<property name="item" value="c"></property>
+			</include>
+		from blog c
+		<where>
+			c.user_id = #{userId}
+		</where>
+		limit 0,20			
+	</select>
+	
+	
+	
+	<insert id="saveBlog"  parameterType="com.lw.blog.bean.Blog">
+		insert into blog(blog_id,user_id,content,blog_date,labels)
+		values(#{blogId},#{userId},#{content},#{blogDate},#{labels})
+	</insert>
+
+
+	<update id="updateBlogById" parameterType="com.lw.blog.bean.Blog">
+		<if test="blogId!=null and blogId!=''">
+			update blog set blog_date = #{blogDate},content = #{content},
+			title=#{title} 
+			where blog_id = #{blogId}
+		</if>
+	</update>
+	
+	<update id="deleteBlogById" parameterType="int">
+		update blog set is_delete = 1
+		where blog_id = #{blogId}
+	</update>
+	
+	<delete id="deleteBlogByCondition" parameterType="java.util.Map">
+		<if test="paramMap!=null">
+			delete from blog
+			<where>
+				<foreach collection="paramMap" item="value" index="key">
+					and ${key} = #{value}
+				</foreach>
+			</where>
+		</if>
+	</delete>
+
+
+</mapper>

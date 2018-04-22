@@ -2,6 +2,7 @@ package com.lw.test;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -11,6 +12,8 @@ import com.lw.service.ICustomerService;
 
 public class CustomerTest extends TestCase {
 
+	
+	
 	@Test
 	public void testAddCustomer(){
 		ApplicationContext act = new ClassPathXmlApplicationContext("applicationContext.xml");
