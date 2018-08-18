@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>错误页面</title>
+</head>
+<body>
+	<h1>错误页面</h1>
+	<span style="color:red;">你的操作发生错误！原因：
+		<span th:text="${reason}"></span>
+	</span>
+	<br/>
+	<span style="color:blue;">地址：
+		<span th:text="${url}"></span>
+	</span>
+</body>
+</html>
