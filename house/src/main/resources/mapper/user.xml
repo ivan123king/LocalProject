@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lw.house.mapper.UserMapper">
+
+	<!-- 此处resultType不需要写全名，是因为在mybatis-config中typeAlias节点处定义了User类的别名 -->
+	<select id="selectUsers" resultType="user">
+		select id from user 
+	</select>
+
+</mapper>
