@@ -1,0 +1,102 @@
+2018-10-07 15:22:54.412 [main] INFO  [com.lw.HouseApplication:50] - Starting HouseApplication on lenovo-PC with PID 12048 (D:\own_workspace\house\target\classes started by lenovo in D:\own_workspace\house)
+2018-10-07 15:22:54.421 [main] INFO  [com.lw.HouseApplication:659] - No active profile set, falling back to default profiles: default
+2018-10-07 15:22:54.523 [main] INFO  [o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext:590] - Refreshing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@6187d1f5: startup date [Sun Oct 07 15:22:54 CST 2018]; root of context hierarchy
+2018-10-07 15:22:57.569 [main] INFO  [org.eclipse.jetty.util.log:193] - Logging initialized @5451ms to org.eclipse.jetty.util.log.Slf4jLog
+2018-10-07 15:22:57.733 [main] INFO  [o.s.b.w.e.jetty.JettyServletWebServerFactory:143] - Server initialized with port: 8090
+2018-10-07 15:22:57.737 [main] INFO  [org.eclipse.jetty.server.Server:374] - jetty-9.4.9.v20180320; built: 2018-03-20T20:21:10+08:00; git: 1f8159b1e4a42d3f79997021ea1609f2fbac6de5; jvm 1.8.0_111-b14
+2018-10-07 15:22:58.004 [main] INFO  [org.eclipse.jetty.server.session:366] - DefaultSessionIdManager workerName=node0
+2018-10-07 15:22:58.004 [main] INFO  [org.eclipse.jetty.server.session:371] - No SessionScavenger set, using defaults
+2018-10-07 15:22:58.007 [main] INFO  [org.eclipse.jetty.server.session:149] - Scavenging every 660000ms
+2018-10-07 15:22:58.021 [main] INFO  [o.e.j.server.handler.ContextHandler.application:2221] - Initializing Spring embedded WebApplicationContext
+2018-10-07 15:22:58.021 [main] INFO  [org.springframework.web.context.ContextLoader:285] - Root WebApplicationContext: initialization completed in 3498 ms
+2018-10-07 15:22:58.304 [main] INFO  [o.s.boot.web.servlet.FilterRegistrationBean:244] - Mapping filter: 'characterEncodingFilter' to: [/*]
+2018-10-07 15:22:58.305 [main] INFO  [o.s.boot.web.servlet.FilterRegistrationBean:244] - Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+2018-10-07 15:22:58.306 [main] INFO  [o.s.boot.web.servlet.FilterRegistrationBean:244] - Mapping filter: 'httpPutFormContentFilter' to: [/*]
+2018-10-07 15:22:58.306 [main] INFO  [o.s.boot.web.servlet.FilterRegistrationBean:244] - Mapping filter: 'requestContextFilter' to: [/*]
+2018-10-07 15:22:58.307 [main] INFO  [o.s.boot.web.servlet.FilterRegistrationBean:257] - Mapping filter: 'logFilter' to urls: [*]
+2018-10-07 15:22:58.308 [main] INFO  [o.s.boot.web.servlet.ServletRegistrationBean:185] - Servlet statViewServlet mapped to [/druid/*]
+2018-10-07 15:22:58.311 [main] INFO  [o.s.boot.web.servlet.ServletRegistrationBean:185] - Servlet dispatcherServlet mapped to [/]
+2018-10-07 15:22:58.320 [main] INFO  [org.eclipse.jetty.server.handler.ContextHandler:788] - Started o.s.b.w.e.j.JettyEmbeddedWebAppContext@7e72a6cc{/,[org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory$LoaderHidingResource@6015a4a5],AVAILABLE}
+2018-10-07 15:22:58.322 [main] INFO  [org.eclipse.jetty.server.Server:411] - Started @6206ms
+2018-10-07 15:22:58.879 [main] INFO  [com.alibaba.druid.pool.DruidDataSource:106] - {dataSource-1} inited
+2018-10-07 15:22:59.874 [main] INFO  [o.s.web.servlet.handler.SimpleUrlHandlerMapping:373] - Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-10-07 15:23:00.363 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerAdapter:574] - Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@6187d1f5: startup date [Sun Oct 07 15:22:54 CST 2018]; root of context hierarchy
+2018-10-07 15:23:00.495 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerMapping:547] - Mapped "{[/index]}" onto public java.lang.String com.lw.house.controller.HelloController.index()
+2018-10-07 15:23:00.496 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerMapping:547] - Mapped "{[/hello]}" onto public java.lang.String com.lw.house.controller.HelloController.hello(org.springframework.ui.ModelMap)
+2018-10-07 15:23:00.498 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerMapping:547] - Mapped "{[/user]}" onto public java.util.List<com.lw.house.common.model.User> com.lw.house.controller.UserController.getUsers()
+2018-10-07 15:23:00.506 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerMapping:547] - Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+2018-10-07 15:23:00.508 [main] INFO  [o.s.w.s.m.m.a.RequestMappingHandlerMapping:547] - Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+2018-10-07 15:23:00.579 [main] INFO  [o.s.web.servlet.handler.SimpleUrlHandlerMapping:373] - Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-10-07 15:23:00.580 [main] INFO  [o.s.web.servlet.handler.SimpleUrlHandlerMapping:373] - Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-10-07 15:23:01.045 [main] INFO  [o.s.w.servlet.view.freemarker.FreeMarkerConfigurer:131] - ClassTemplateLoader for Spring macros added to FreeMarker configuration
+2018-10-07 15:23:01.322 [main] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:433] - Registering beans for JMX exposure on startup
+2018-10-07 15:23:01.324 [main] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:895] - Bean with name 'dataSource' has been autodetected for JMX exposure
+2018-10-07 15:23:01.324 [main] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:895] - Bean with name 'statFilter' has been autodetected for JMX exposure
+2018-10-07 15:23:01.334 [main] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:668] - Located MBean 'dataSource': registering with JMX server as MBean [com.alibaba.druid.pool:name=dataSource,type=DruidDataSource]
+2018-10-07 15:23:01.336 [main] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:668] - Located MBean 'statFilter': registering with JMX server as MBean [com.alibaba.druid.filter.stat:name=statFilter,type=StatFilter]
+2018-10-07 15:23:01.358 [main] INFO  [o.e.j.server.handler.ContextHandler.application:2221] - Initializing Spring FrameworkServlet 'dispatcherServlet'
+2018-10-07 15:23:01.359 [main] INFO  [org.springframework.web.servlet.DispatcherServlet:494] - FrameworkServlet 'dispatcherServlet': initialization started
+2018-10-07 15:23:01.383 [main] INFO  [org.springframework.web.servlet.DispatcherServlet:509] - FrameworkServlet 'dispatcherServlet': initialization completed in 24 ms
+2018-10-07 15:23:01.432 [main] INFO  [org.eclipse.jetty.server.AbstractConnector:289] - Started ServerConnector@9b2dc56{HTTP/1.1,[http/1.1]}{0.0.0.0:8090}
+2018-10-07 15:23:01.437 [main] INFO  [o.s.boot.web.embedded.jetty.JettyWebServer:158] - Jetty started on port(s) 8090 (http/1.1) with context path '/'
+2018-10-07 15:23:01.445 [main] INFO  [com.lw.HouseApplication:59] - Started HouseApplication in 7.708 seconds (JVM running for 9.328)
+2018-10-07 15:23:15.288 [qtp1766122814-23] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.653 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.665 [qtp1766122814-26] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.670 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.682 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.684 [qtp1766122814-27] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.717 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.717 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.728 [qtp1766122814-38] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.729 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.730 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.775 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.818 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.822 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.846 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.857 [qtp1766122814-27] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.888 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.945 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.953 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.971 [qtp1766122814-38] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.979 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:15.985 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.006 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.051 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.056 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.061 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.065 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.071 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.075 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.068 [qtp1766122814-38] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.080 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.100 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.110 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.110 [qtp1766122814-38] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.114 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.119 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.125 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.146 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.153 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.165 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.184 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.185 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.190 [qtp1766122814-28] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.191 [qtp1766122814-38] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.194 [qtp1766122814-24] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.199 [qtp1766122814-21] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.222 [qtp1766122814-39] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.243 [qtp1766122814-39] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.244 [qtp1766122814-25] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.347 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:16.351 [qtp1766122814-37] INFO  [com.lw.filter.LogFilter:28] - Request coming
+2018-10-07 15:23:29.790 [RMI TCP Connection(2)-192.168.0.102] INFO  [o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin:132] - Application shutdown requested.
+2018-10-07 15:23:29.791 [RMI TCP Connection(2)-192.168.0.102] INFO  [o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext:993] - Closing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@6187d1f5: startup date [Sun Oct 07 15:22:54 CST 2018]; root of context hierarchy
+2018-10-07 15:23:29.798 [RMI TCP Connection(2)-192.168.0.102] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:451] - Unregistering JMX-exposed beans on shutdown
+2018-10-07 15:23:29.799 [RMI TCP Connection(2)-192.168.0.102] INFO  [o.s.jmx.export.annotation.AnnotationMBeanExporter:183] - Unregistering JMX-exposed beans
+2018-10-07 15:23:29.802 [RMI TCP Connection(2)-192.168.0.102] INFO  [com.alibaba.druid.pool.DruidDataSource:106] - {dataSource-1} closed
+2018-10-07 15:23:29.814 [RMI TCP Connection(2)-192.168.0.102] INFO  [org.eclipse.jetty.server.AbstractConnector:332] - Stopped ServerConnector@9b2dc56{HTTP/1.1,[http/1.1]}{0.0.0.0:8090}
+2018-10-07 15:23:29.815 [RMI TCP Connection(2)-192.168.0.102] INFO  [org.eclipse.jetty.server.session:167] - Stopped scavenging
+2018-10-07 15:23:29.818 [RMI TCP Connection(2)-192.168.0.102] INFO  [o.e.j.server.handler.ContextHandler.application:2221] - Destroying Spring FrameworkServlet 'dispatcherServlet'
+2018-10-07 15:23:29.821 [RMI TCP Connection(2)-192.168.0.102] INFO  [org.eclipse.jetty.server.handler.ContextHandler:957] - Stopped o.s.b.w.e.j.JettyEmbeddedWebAppContext@7e72a6cc{/,[org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory$LoaderHidingResource@6015a4a5],UNAVAILABLE}
