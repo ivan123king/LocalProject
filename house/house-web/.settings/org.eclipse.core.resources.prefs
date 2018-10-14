@@ -1,7 +1,11 @@
 eclipse.preferences.version=1
 encoding//src/main/java=UTF-8
 encoding//src/main/resources/application.properties=UTF-8
+encoding//src/main/resources/templates/accounts/register.ftl=UTF-8
+encoding//src/main/resources/templates/accounts/registerSubmit.ftl=UTF-8
+encoding//src/main/resources/templates/common/common.ftl=UTF-8
 encoding//src/main/resources/templates/error/404.ftl=UTF-8
 encoding//src/main/resources/templates/error/500.ftl=UTF-8
+encoding//src/main/resources/templates/homepage/index.ftl=UTF-8
 encoding//src/test/java=UTF-8
 encoding/<project>=UTF-8

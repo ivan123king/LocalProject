@@ -10,4 +10,15 @@ import com.lw.house.common.model.User;
 public interface UserMapper {
 
 	public List<User> selectUsers();
+	
+	/**
+	 * 
+	 * @param account
+	 * @return 表示插入个数
+	 */
+	public int insert(User account);
+	
+	public int delete(String email);
+	
+	public int update(User account);
 }

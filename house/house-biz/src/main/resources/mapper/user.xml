@@ -7,7 +7,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 此处resultType不需要写全名，是因为在mybatis-config中typeAlias节点处定义了User类的别名 -->
 	<select id="selectUsers" resultType="user">
-		select id from user 
+		select id from user
 	</select>
+
+	<insert id="insert">
+		insert into
+		user(name,phone,email,aboutme,passwd,avatar,type,create_time,enable)
+		values(#{name},#{phone},#{email},#{aboutme},#{passwd},#{avatar},#{type},#{createTime},#{enable})
+	</insert>
+
+	<delete id="delete">
+		delete from user where email = #{email}
+	</delete>
+	
+	<update id="update">
+		update user
+			<set>
+				<if test="phone != null and phone != ''">
+					phone = #{phone}
+				</if>
+				<if test="name !=null and name != ''">
+					name = #{name}
+				</if>
+				<if test="aboutme !=null and aboutme != ''">
+					aboutme = #{aboutme}
+				</if>
+				<if test="passwd !=null and passwd != ''">
+					passwd = #{passwd}
+				</if>
+				<if test="enable !=null and enable != ''">
+					enable = #{enable}
+				</if>
+			</set>
+			where email = #{email}
+	</update>
 
 </mapper>
