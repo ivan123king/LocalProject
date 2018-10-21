@@ -9,6 +9,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectUsers" resultType="user">
 		select id from user
 	</select>
+	
+	<select id="selectUsersByQuery" resultType="user">
+		select * from user
+		<where>
+			<if test="id !=null">
+				and id=#{id}
+			</if>
+			<if test="email !=null">
+				and email = #{email}
+			</if>
+			<if test="passwd !=null">
+				and passwd = #{passwd}
+			</if>
+			<if test="enable !=null">
+				and enable = #{enable}
+			</if>
+			<if test="type!=null and type!=0">
+				and type=#{type}
+			</if>
+		</where>
+	</select>
 
 	<insert id="insert">
 		insert into
@@ -22,18 +43,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<update id="update">
 		update user
+		<!-- 
+			set 元素会动态前置 SET 关键字，同时也会删掉无关的逗号，因为用了条件语句之后很可能就会在生成的 SQL 语句的后面留下这些逗号。
+			（译者注：因为用的是“if”元素，若最后一个“if”没有匹配上而前面的匹配上，SQL 语句的最后就会有一个逗号遗留）
+		 -->
 			<set>
 				<if test="phone != null and phone != ''">
-					phone = #{phone}
+					phone = #{phone},
 				</if>
 				<if test="name !=null and name != ''">
-					name = #{name}
+					name = #{name},
 				</if>
 				<if test="aboutme !=null and aboutme != ''">
-					aboutme = #{aboutme}
+					aboutme = #{aboutme},
 				</if>
 				<if test="passwd !=null and passwd != ''">
-					passwd = #{passwd}
+					passwd = #{passwd},
 				</if>
 				<if test="enable !=null and enable != ''">
 					enable = #{enable}
@@ -41,5 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			</set>
 			where email = #{email}
 	</update>
+
+	
 
 </mapper>

@@ -3,6 +3,7 @@ package com.lw.house.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,9 @@ public class UserService {
 	
 	@Autowired
 	private MailService mailService;
+	
+	@Value("${file.prefix}")
+	private String imgPrefix;
 	
 	public List<User> getUsers(){
 		return userMapper.selectUsers();
@@ -63,5 +67,39 @@ public class UserService {
 	 */
 	public boolean enable(String key){
 		return mailService.enable(key);
+	}
+	
+	/**
+	 * 登录认证
+	 * @param username
+	 * @return
+	 */
+	public User auth(String username,String password){
+		User user = new User();
+		user.setEmail(username);
+		user.setPasswd(HashUtils.encryPassword(password));
+		List<User> list = getUserByQuery(user);
+		if(!list.isEmpty()) return list.get(0);
+		return null;
+	}
+	
+	/**
+	 * 查询用户信息
+	 * @param user
+	 * @return
+	 */
+	public List<User> getUserByQuery(User user){
+		List<User> list = userMapper.selectUsersByQuery(user);
+		list.forEach(u->{
+			u.setAvatar(imgPrefix+u.getAvatar());
+		});
+		return list;
+	}
+	
+	public void updateUser(User updateUser,String email){
+		updateUser.setEmail(email);
+		//此处利用反射对一些默认变量如时间做修改
+		BeanHelper.onUpdate(updateUser);
+		userMapper.update(updateUser);
 	}
 }

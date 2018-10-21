@@ -21,4 +21,6 @@ public interface UserMapper {
 	public int delete(String email);
 	
 	public int update(User account);
+	
+	public List<User> selectUsersByQuery(User user);
 }
