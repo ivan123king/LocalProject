@@ -225,7 +225,7 @@
 <#macro paging pagination>
         <ul class="pagination">
            <#list pagination.pages as page>
-               <#if pagination.pageNum==page>
+               <#if pagination.pageNo==page>
                     <li class="active"><a href="#">${page}</a></li>
                <#else>
                     <li><a href="javascript:void(0)"  onclick="nextPage(${page},${pagination.pageSize})">${page}</a></li>

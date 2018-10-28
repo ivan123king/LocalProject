@@ -23,10 +23,13 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	<!-- 定义别名 -->
 	<typeAliases>
 		<typeAlias type="com.lw.house.common.model.User" alias="user"/>
+		<typeAlias type="com.lw.house.common.model.House" alias="house"/>
+		<typeAlias type="com.lw.house.common.model.Community" alias="community"/>
 	</typeAliases>
 
 	<mappers>
 		<mapper resource="mapper/user.xml"></mapper>
+		<mapper resource="mapper/house.xml"></mapper>
 	
 	</mappers>
 
