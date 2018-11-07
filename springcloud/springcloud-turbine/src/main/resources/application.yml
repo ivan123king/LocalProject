@@ -1,0 +1,17 @@
+eureka:
+   client:
+      serviceUrl:
+         defaultZone: http://localhost:8761/eureka
+server:
+   port: 8903
+spring:
+   application:
+      name: hystrix-dashboard-turbine
+turbine:
+   # springcloud-feign,springcloud-ribbon 表明要监控的微服务
+   appConfig: service-feign,service-ribbon 
+   # 指定聚合哪些集群，多个使用”,”分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
+   appregator: 
+      clusterConfig: default
+   #指定集群名称，可以是三种类型的值
+   clusterNameExpression: new String("default")
