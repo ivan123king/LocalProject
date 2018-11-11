@@ -28,7 +28,7 @@ public class Pagination {
 		this.totalCount = totalCount;
 		this.pageNo = pageNo;
 		this.pageSize = pageSize;
-		for(int i=0;i<=pageNo;i++){
+		for(int i=1;i<=pageNo;i++){
 			pages.add(i);
 		}
 		//总共多少页

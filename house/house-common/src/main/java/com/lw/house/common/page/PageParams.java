@@ -16,7 +16,7 @@ public class PageParams {
 	
 	public static PageParams build(Integer pageSize,Integer pageNo){
 		if(pageSize==null) pageSize = PAGE_SIZE;
-		if(pageNo==null) pageNo = 1;
+		if(pageNo==null||pageNo<=0) pageNo = 1;
 		return new PageParams(pageSize, pageNo);
 	}
 	

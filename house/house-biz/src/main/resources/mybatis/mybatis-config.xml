@@ -25,12 +25,13 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<typeAlias type="com.lw.house.common.model.User" alias="user"/>
 		<typeAlias type="com.lw.house.common.model.House" alias="house"/>
 		<typeAlias type="com.lw.house.common.model.Community" alias="community"/>
+		<typeAlias type="com.lw.house.common.model.HouseUser" alias="houseUser"/>
 	</typeAliases>
 
 	<mappers>
 		<mapper resource="mapper/user.xml"></mapper>
 		<mapper resource="mapper/house.xml"></mapper>
-	
+		<mapper resource="mapper/agency.xml"></mapper>
 	</mappers>
 
 </configuration>

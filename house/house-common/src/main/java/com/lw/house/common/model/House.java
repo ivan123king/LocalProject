@@ -3,10 +3,10 @@ package com.lw.house.common.model;
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**

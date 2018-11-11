@@ -14,9 +14,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 此处resultType不需要写全名，是因为在mybatis-config中typeAlias节点处定义了User类的别名 -->
 	<select id="selectPageHouses" resultType="house">
-		select <include refid="houseField"></include>
+		select
+		<include refid="houseField"></include>
 		from house a
-		<include refid="houseCondition"/>
+		<include refid="houseCondition" />
 		<choose>
 			<when test="house.sort!=null and house.sort=='price_asc'">
 				order by a.price asc
@@ -24,6 +25,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<when test="house.sort!=null and house.sort=='price_desc'">
 				order by a.price desc
 			</when>
+			<otherwise>
+				order by a.create_time desc
+			</otherwise>
 		</choose>
 		<if test="pageParams.offset !=null and pageParams.limit!=null">
 			limit #{pageParams.offset},#{pageParams.limit}
@@ -32,8 +36,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			limit #{pageParams.limit}
 		</if>
 	</select>
-	
+
 	<sql id="houseCondition">
+		<if test="house.userId!=null and house.userId!=0">
+			inner join (select house_id,user_id from house_user
+				<where>
+					user_id = #{house.userId}
+					<if test="house.bookmarked!=null and house.bookmarked==true">
+						and type = 2
+					</if>
+					<if test="house.bookmarked!=null and house.bookmarked==false">
+						and type = 1
+					</if>
+				</where>
+			) b
+			on a.id=b.house_id
+		</if>
 		<where>
 			<if test="house.id!=null and house.id!=0">
 				and a.id = #{house.id}
@@ -42,12 +60,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				and a.type = #{house.type}
 			</if>
 			<if test="house.name!=null and house.name!=''">
-				<bind name="pattern1" value=" '%'+house.name+'%' " ></bind>
+				<bind name="pattern1" value=" '%'+house.name+'%' "></bind>
 				and a.name like #{pattern1}
 			</if>
 			<if test="house.ids">
-				and a.id in 
-				<foreach collection="house.ids" item="item" index="index" 
+				and a.id in
+				<foreach collection="house.ids" item="item" index="index"
 					open="(" close=")" separator=",">
 					#{item}
 				</foreach>
@@ -58,9 +76,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectPageCount" resultType="long">
 		select count(id) from house a
-		<include refid="houseCondition"/>
+		<include refid="houseCondition" />
 	</select>
-	
+
 	<!-- 查询小区 -->
 	<select id="selectCommunity" resultType="community">
 		select * from community
@@ -73,6 +91,45 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			</if>
 		</where>
 	</select>
+
+	<insert id="insertUserMsg">
+		insert into house_msg
+		(msg,create_time,user_name,house_id,agent_id)
+		value
+		(#{msg},#{createtime},#{userName},#{houseId},#{agentId})
+	</insert>
+
+	<select id="selectSaleHouseUser" resultType="houseUser">
+		select id,house_id,user_id,create_time,type
+		from house_user
+		where house_id = #{id} and type = 1
+		limit 1
+	</select>
 	
+	<!-- 将数据库生成的ID设置到 keyProperty的id字段上 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into house(type,name,price,images,area,beds,baths,rating,remarks,properties,
+			floor_plan,tags,create_time,city_id,community_id,address,state)
+		value(#{type},#{name},#{price},#{images},#{area},#{beds},#{baths},#{rating},#{remarks},#{properties},
+			#{floorPlan},#{tags},#{createTime},#{cityId},#{communityId},#{address},#{state})
+	</insert>
+
+	<select id="selectHouseUser" resultType="houseUser">
+		select id,house_id,user_id,create_time,type
+		from house_user
+		where house_id = #{houseId} and user_id=#{userId} and type=#{type}
+	</select>
+	<insert id="insertHouseUser">
+		insert into house_user(house_id,user_id,create_time,type)
+		value(#{houseId},#{userId},#{createTime},#{type})
+	</insert>
+
+	<update id="updateHouse">
+		update house set rating = #{rating} where id=#{id}
+	</update>
 	
+	<delete id="deleteHouseUser">
+		delete from house_user where house_id = #{houseId} and user_id = #{userId} and type=#{type}
+	</delete>
+
 </mapper>
