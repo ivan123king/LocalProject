@@ -18,8 +18,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<sql id="blog_c">
-		${item}.blog_id ,${item}.user_id,${item}.content,${item}.blog_date
+		${item}.blog_id ,${item}.user_id,${item}.content,${item}.blog_date,${item}.title
 	</sql>
+	<select id="findBlogById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select 
+			<include refid="blog_c">
+				<property name="item" value="c"></property>
+			</include>
+		from blog c
+		<where>
+			c.blog_id = #{blogId}
+		</where>
+		limit 1
+	</select>
+	
 	<select id="findBlogByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap"
 		useCache="true">
 		select
@@ -31,6 +43,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			c.user_id = #{userId}
 		</where>
 		limit 0,20			
+	</select>
+	
+	<select id="findBlogByDate" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+			<include refid="blog_c">
+				<property name="item" value="c"></property>
+			</include>
+		from blog c
+		<where>
+			c.user_id = #{userId}
+		</where>
+		order by c.blog_date desc
+		limit 1
 	</select>
 	
 	
@@ -45,7 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="blogId!=null and blogId!=''">
 			update blog set blog_date = #{blogDate},content = #{content},
 			title=#{title} 
-			where blog_id = #{blogId}
+			where blog_id = #{blogId} and user_id = #{userId}
 		</if>
 	</update>
 	

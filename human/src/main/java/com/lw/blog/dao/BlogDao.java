@@ -18,6 +18,13 @@ public interface BlogDao {
 	public void updateBlog(Blog blog,Map map);
 	public Blog findBlogById(int blogId,Map map);
 	public List<Blog> findBlogByUserId(int userId,Map map);
+	/**
+	 * 查找用户最近插入的一条博客记录
+	 * @param userId
+	 * @param map
+	 * @return
+	 */
+	public Blog findBlogByDate(int userId,Map map);
 	public List<Blog> findBlogByLabel(List<String> labels,Map map) ;
 	public List<Blog> findBlogByContent(String content,Map map);
 }

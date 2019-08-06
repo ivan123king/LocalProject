@@ -17,7 +17,7 @@
 		function() {}); */
 		
 		$(function(){
-			 $("#contentDiv pre")
+			 $("#blogContent pre")
 				.each(
 					function() {
 						var $this = $(this);
@@ -52,10 +52,29 @@
 </script>
 </head>
 <body>
-	<div id="contentDiv" class="article_content"
+	<label id="blogId" style="display:none;"><%=request.getAttribute("blogId") %></label>
+	<h2 id="blogTitle">
+		<%=request.getAttribute("blogTitle") %>
+	</h2>
+	<div id="blogContent" class="article_content"
 		style="width: 99%; text-align: left">
 		<!-- 下面这个是CSDN的代码那个高亮显示的东西 -->
-		<%=request.getAttribute("blog_content") %>
+		<%=request.getAttribute("blogContent") %>
 	</div>
 </body>
+<script>
+	function updateBlog(){
+		var blogId = $("#blogId").text();
+		var blogTitle = $("#blogTitle").text();
+		var blogContent = $("blogContent").text();
+		$.ajax({  
+	         type : "post",  
+	          url : "<%=request.getContextPath() %>/blog/updateblog",  
+	          data : {"blogId":blogId,"blogTitle":blogTitle,"blogContent":blogContent},
+	          async : true,  
+	          success : function(data){  
+	          }  
+	     }); 
+	}
+</script>
 </html>

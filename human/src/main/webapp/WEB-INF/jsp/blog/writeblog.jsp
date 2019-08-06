@@ -27,6 +27,8 @@
 		<div id="writeblogDiv">
 			<!-- 书写博客HTML代码 -->
 			<form id="blog_form" action="<%=request.getContextPath() %>/blog/writeblog.action" method="post">
+	        	<span>标题：</span><input type="text" name="title"/>
+	        	<br/>
 	        	<textarea id="blog" name="content">
 	            </textarea>
 	            <button onclick="commitBlog();">提交</button>

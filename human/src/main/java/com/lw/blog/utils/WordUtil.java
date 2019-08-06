@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,32 +12,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.converter.WordToHtmlConverter;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.model.PicturesTable;
 import org.apache.poi.hwpf.usermodel.CharacterRun;
 import org.apache.poi.hwpf.usermodel.Picture;
 import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xwpf.converter.core.FileImageExtractor;
+import org.apache.poi.xwpf.converter.core.FileURIResolver;
+import org.apache.poi.xwpf.converter.core.IURIResolver;
+import org.apache.poi.xwpf.converter.xhtml.XHTMLConverter;
+import org.apache.poi.xwpf.converter.xhtml.XHTMLOptions;
 import org.apache.poi.xwpf.usermodel.BodyElementType;
 import org.apache.poi.xwpf.usermodel.IBodyElement;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFStyles;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyles;
 
 import com.lw.blog.constinfo.ConstFile;
+
 
 /**
  * 解析word文档的工具类
@@ -234,12 +249,84 @@ public class WordUtil {
 			}
 		}
 	}
+	
+	/**
+	 * 将word转变为html
+	 * @param filePath
+	 * @param fileName
+	 * @param htmlName
+	 * @throws IOException 
+	 * @throws FactoryConfigurationError 
+	 * @throws ParserConfigurationException 
+	 * @throws TransformerException 
+	 */
+	public static void wordToHtml(String filePath,String fileName,String htmlPath,String htmlName) throws IOException, ParserConfigurationException, FactoryConfigurationError, TransformerException{
+		
+		final String fileStr = filePath+fileName;
+		File file = new File(fileStr);
+		/*
+		 * 1.判断是doc还是docx
+		 */
+		if(fileName.endsWith(".docx")||fileName.endsWith(".DOCX")){
+			/*
+			 * 进行docx文件变为html文件的转换
+			 */
+			InputStream is = new FileInputStream(file);
+			XWPFDocument document = new XWPFDocument(is);
+			//设置用来存放图片的目录
+			File imageFolderFile = new File(htmlPath+htmlName.substring(0,htmlName.lastIndexOf(".html"))+File.separator);
+			if(!imageFolderFile.exists()){
+				imageFolderFile.mkdir();
+			}
+			XHTMLOptions options = XHTMLOptions.create().URIResolver(new FileURIResolver(imageFolderFile));
+			options.setExtractor(new FileImageExtractor(imageFolderFile));
+			options.setIgnoreStylesIfUnused(false);
+			options.setFragment(true);
+			//将XWPFDocument转换成Html
+			OutputStream out = new FileOutputStream(new File(htmlPath+htmlName));
+			XHTMLConverter.getInstance().convert(document, out, options);
+		}else if(fileName.endsWith(".doc")||fileName.endsWith(".DOC")){
+			/*
+			 * 进行doc文件变为html文件的转换 
+			 */
+			InputStream is = new FileInputStream(file);
+			HWPFDocument document = new HWPFDocument(is);
+			WordToHtmlConverter converter = new WordToHtmlConverter(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+			//解析word文档
+			converter.processDocument(document);
+			org.w3c.dom.Document htmlDocument = converter.getDocument();
+			File htmlFile = new File(htmlPath+htmlName);
+			OutputStream outStream = new FileOutputStream(htmlFile);
+			DOMSource domSource = new DOMSource(htmlDocument);
+			StreamResult streamResult = new StreamResult(outStream);
+			TransformerFactory factory = TransformerFactory.newInstance();
+			Transformer serializer = factory.newTransformer();
+			serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			serializer.setOutputProperty(OutputKeys.INDENT,"yes");
+			serializer.setOutputProperty(OutputKeys.METHOD, "html");
+			
+			serializer.transform(domSource, streamResult);
+			outStream.close();
+		}
+		
+		
+		
+	}
 
 	public static void main(String[] args) {
 		String filePath = "D:\\tmp\\cc.docx";
+		filePath = "D:\\tmp\\";
+		String fileName = "test2018.docx";
+		String htmlPath = filePath;
+		String htmlName = "test2018.html";
 		try {
 			// WordUtil.readPicture(filePath);
-			WordUtil.readWord(filePath);
+//			WordUtil.readWord(filePath);
+//			WordUtil.wordToHtml(filePath, fileName, htmlPath,htmlName);
+			
+			String fileP = "D:/own_workspace/human/target/m2e-wtp/web-resources/upload/word/cfdac58f308e4431b5a30d7f5e6b89cd.docx";
+			String uploadPath = "D:/own_workspace/human/target/m2e-wtp/web-resources/upload/word/";
+			System.out.println(fileP.substring(fileP.lastIndexOf("/")));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -29,5 +29,12 @@
      <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
       p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
       
+     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">  
+	    <property name="messageConverters">  
+	        <list>  
+	            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />  
+	   		</list>
+	    </property>  
+	</bean>  
       
 </beans>

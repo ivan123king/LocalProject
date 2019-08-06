@@ -11,6 +11,10 @@ public interface BlogMapper {
 	
 	public List<Blog> findBlogByUserId(int userId);
 	
+	public Blog findBlogByDate(int userId);
+	
+	public Blog findBlogById(int blogId);
+	
 	public void updateBlogById(Blog blog);
 	
 	/**

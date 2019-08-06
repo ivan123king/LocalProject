@@ -11,6 +11,9 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -145,6 +148,7 @@ public class UploadFileC {
 							}
 							is.close();
 							out.close();
+							break;
 						}
 					}
 				}
@@ -159,9 +163,25 @@ public class UploadFileC {
 		//解析成html的数据
 		String html = "";
 		if(fileP!=null&&!"".equals(fileP)){
-			Document document = WordUtil.readWord(fileP);
-			html = HtmlUtil.createHtmlPage(document);
+//			Document document = WordUtil.readWord(fileP);
+//			html = HtmlUtil.createHtmlPage(document);
+			String filePath = uploadPath;
+			String fileName = fileP.substring(fileP.lastIndexOf(File.separator)+1);
+			String htmlPath =  request.getSession().getServletContext().getRealPath("")+ConstFile.HTML_PATH+File.separator;
+			String htmlName = fileName.substring(0,fileName.lastIndexOf("."))+".html";
+			try {
+				WordUtil.wordToHtml(filePath, fileName, htmlPath, htmlName);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (FactoryConfigurationError e) {
+				e.printStackTrace();
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			}
 		}
+		
 		
 		request.setAttribute("html", html);
 		return "blog/blog";

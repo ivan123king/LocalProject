@@ -1,3 +1,14 @@
+规范：
+	Java代码一律使用驼峰命名方式，
+	使用bean传递到前台的Json的key是使用“_”,如果手动塞的json的key，依旧使用驼峰方式。
+	前端传递到后台的json数据的key命名使用驼峰方式。
+	
+Session中目前存在的数据：
+	/login 中：
+		session.setAttribute("username", name);
+		session.setAttribute("userId", user.getUserId());
+		session.setAttribute("customerId", user.getCustomerId());	
+
 user:
 	客户用户相关模块，登录注册
 	1. 注册唯一验证的ID是必须唯一没有注册过的。
@@ -8,3 +19,27 @@ user:
 		
 blog:
 	博客模块，写博客，通过上传word变为博客
+	
+
+碰到一个问题：
+	springmvc中如果要postman传递过来json数据通过如下代码可以获取到。但如果通过request.getParameter就不行
+	BufferedReader r;
+			try {
+				r = request.getReader();
+				String c = r.readLine();
+				while(c!=null){
+					System.out.println(c);
+					c = r.readLine();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	或者可以通过 @RequestBody Blog blog这种方法
+	
+	
+	
+	
+	
+	
+	

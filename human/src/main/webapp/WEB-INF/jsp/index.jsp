@@ -13,6 +13,10 @@
 <body>
 	<input type="hidden" value="<%=userId%>"/>
 	欢迎用户<%=userName %>
+	<br/>
 	
+	<a href="<%=request.getContextPath()%>/navigation/writeblog" target="_blank">写博客</a><br/>
+	<a href="<%=request.getContextPath()%>/navigation/bloglist" target="_blank">博客列表</a><br/>
+		
 </body>
 </html>

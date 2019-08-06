@@ -12,6 +12,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.lw.utils.StringUtil;
+
 /**
  * Servlet Filter implementation class CustomerSessionFilter
  */
@@ -42,16 +44,20 @@ public class CustomerSessionFilter implements Filter {
 			HttpSession session = hRequest.getSession();
 			Enumeration<String> aNames = session.getAttributeNames();
 			boolean hasSet = false;
-			while(aNames.hasMoreElements()){
-				String name = aNames.nextElement();
-				if(name.equals("userId")){
-					hasSet = true;
+			String userId = (String) hRequest.getAttribute("userId");
+			if(StringUtil.isEmpty(userId))
+				while(aNames.hasMoreElements()){
+					String name = aNames.nextElement();
+					if(name.equals("userId")){
+						hasSet = true;
+					}
 				}
-			}
+			else
+				session.setAttribute("userId",Integer.parseInt(userId));
 			//没有设置登录时的Session中属性就设置一个临时的，为了测其他内容，一直登录挺麻烦的
 			if(!hasSet){
-				session.setAttribute("username", "temp");
 				session.setAttribute("userId",2);
+				session.setAttribute("username", "temp");
 				session.setAttribute("customerId",1);
 			}
 		}

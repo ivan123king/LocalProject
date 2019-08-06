@@ -3,6 +3,8 @@ package com.lw.blog.bean;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.alibaba.fastjson.annotation.JSONField;
 
 public class Blog {
@@ -11,9 +13,11 @@ public class Blog {
 	private int userId;//用户ID
 	private String title;//标题
 	private String content;//内容
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date blogDate;//写作日期
 	private String labels;//博客属性标签,","号分隔
 	private int isDelete;//表示是否删除，0否，1是，使用Task定时清理
+	private String userName;//作者
 	
 	@JSONField(name="blog_id")
 	public int getBlogId() {
@@ -68,5 +72,13 @@ public class Blog {
 	public void setIsDelete(int isDelete) {
 		this.isDelete = isDelete;
 	}
+	@JSONField(name="user_name")
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 	
 }

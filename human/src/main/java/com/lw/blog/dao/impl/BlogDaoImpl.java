@@ -40,10 +40,13 @@ public class BlogDaoImpl extends SqlSessionDaoSupport implements BlogDao{
 	}
 
 	public Blog findBlogById(int blogId, Map map) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getBlogMapper().findBlogById(blogId);
 	}
 
+	public Blog findBlogByDate(int userId,Map map){
+		return this.getBlogMapper().findBlogByDate(userId);
+	}
+	
 	public List<Blog> findBlogByUserId(int userId, Map map) {
 		return this.getBlogMapper().findBlogByUserId(userId);
 	}

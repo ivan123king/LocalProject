@@ -1,11 +1,14 @@
 package com.lw.other;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.lw.blog.bean.Blog;
+import com.lw.blog.dao.BlogDao;
+import com.lw.blog.service.BlogService;
 
 /**
  * 导航到页面的Controller类
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(value="/navigation")
 public class NavigationC {
+	
+	@Autowired
+	public BlogService blogService;
 
 	/**
 	 * 前往注册页面
@@ -46,6 +52,18 @@ public class NavigationC {
 	@RequestMapping(value="/bloglist")
 	public String toBlogList(){
 		return "redirect:/blog/listblog";
+	}
+	
+	@RequestMapping(value="/updateblog")
+	public String toUpdateBlog(int blogId,Model model){
+		Blog blog = blogService.findBlogById(blogId);
+		if(blog==null){
+			return "error";
+		}
+		model.addAttribute("blogId",blog.getBlogId());
+		model.addAttribute("blogTitle",blog.getTitle());
+		model.addAttribute("blogContent",blog.getContent());
+		return "blog/updateblog";
 	}
 	
 }

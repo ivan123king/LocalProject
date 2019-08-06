@@ -57,6 +57,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean id="customerDao" class="com.lw.user.dao.impl.CustomerDaoImpl">
     	<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>
+    <bean id="userDao" class="com.lw.user.dao.impl.UserDaoImpl">
+    	<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
     <bean id="blogDao" class="com.lw.blog.dao.impl.BlogDaoImpl">
     	<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
     </bean>

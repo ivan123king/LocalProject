@@ -6,6 +6,7 @@ public class ConstFile {
 	//word start=================将word文档元素转义为以下元素
 	public static String PIC_PATH = "upload"+File.separator+"images";//word中图片保存路径
 	public static String WORD_PATH = "upload"+File.separator+"word";//word文档上传路径
+	public static String HTML_PATH = "upload"+File.separator+"html";
 	public static final String PARAGRAPH = "paragraph";
 	public static final String TABLE = "table";
 	public static final String ROW = "row";
