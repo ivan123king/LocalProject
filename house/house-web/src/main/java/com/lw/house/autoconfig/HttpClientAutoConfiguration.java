@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-// 存在HttpClient这个类时才加载HttpClientAutoConfiguration
+// 存在HttpClientProperties这个类时才加载HttpClientAutoConfiguration
 @ConditionalOnClass({ HttpClient.class })
 @EnableConfigurationProperties(HttpClientProperties.class)
 public class HttpClientAutoConfiguration {
 
 	private final HttpClientProperties properties;
-
+	
 	public HttpClientAutoConfiguration(HttpClientProperties properties) {
 		this.properties = properties;
 	}
