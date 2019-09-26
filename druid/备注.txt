@@ -1,0 +1,11 @@
+spring boot无法启动：
+	问题日志： Unregistering JMX-exposed beans on shutdown
+	网络上有一种解决方式是引入tomcat的maven包 spring-boot-starter-tomcat
+	
+	我采用直接提升spring boot的包版本，原来是1.5.7，现在直接使用2.0.1
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.1.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
