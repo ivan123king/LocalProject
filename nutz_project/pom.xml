@@ -20,7 +20,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 
 		<jetty_version>9.2.14.v20151106</jetty_version>
-		<mysql_version>6.0.6</mysql_version>
+		<mysql_version>8.0.16</mysql_version>
 
 	</properties>
 
